@@ -1,0 +1,104 @@
+\documentclass{report}
+\usepackage[portuges]{babel}
+\usepackage[latin1]{inputenc}
+
+\usepackage{url}
+\usepackage{alltt}
+\usepackage{listings}
+\usepackage{fancyvrb}
+\usepackage{graphicx}
+\usepackage{algorithmic}
+\usepackage[lined,algonl,boxed]{algorithm2e}
+
+\parindent=0pt
+\parskip=2pt
+
+\title{Processamento de Linguagens e Compiladores\\ \textbf{Pré-processador para \LaTeX}\\ Relatório de Desenvolvimento}
+\author{André Sá (76361) \and João Bastos (47419) \and Pedro Sá (78164)}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+O \LaTeX\ é um sistema tipográfico, bastante útil e completo, para a produção de todo o tipo de documentos. Porém, a edição do documento pode-se tornar morosa devido ao peso das marcas (comandos do \LaTeX) necessárias para anotar o texto.
+O trabalho realizado teve como premissa precisamente facilitar a escrita de documentos em \LaTeX\ simplificando certas anotações de forma, conteúdo ou formato. Assim, foi criada uma linguagem mais simples e o respetivo pré-processador, recorrendo ao Lex, que substitui essa notação simplificada pelas marcas finais corretas.
+\end{abstract}
+
+\tableofcontents
+
+\chapter{Introdução}
+Enquadramento.\\
+Conteúdo do documento.\\
+Resultados -- pontos a evidenciar.\\
+Estrutura do documento.
+
+\chapter{Análise e Especificação}
+\section{Descrição informal do problema}
+\section{Especificação do Requisitos}
+\subsection{Dados}
+\subsection{Pedidos}
+\subsection{Relações}
+
+
+\chapter{Concepção/desenho da Resolução}
+\section{Linguagem}
+\subsection{Acentos e Cedilhas}
+
+\begin{tabular}{c l}
+PPP & \LaTeX \\
+\hline
+á &	$\backslash$\'{}a \\
+à & $\backslash$\`{}a \\
+ã & $\backslash$\~{}a \\
+â & $\backslash$\^{}a \\
+é & $\backslash$\'{}e \\
+ê &	$\backslash$\^{}e \\
+í &	$\backslash$\{$\backslash$i\} \\
+Í &	$\backslash$\'{}I \\
+ó &	$\backslash$\'{}o \\
+õ & $\backslash$\~{}o \\
+ô & $\backslash$\^{}o \\
+ú &	$\backslash$\'{}u \\
+ü &	$\backslash$\"{}u \\
+ç &	$\backslash$c\{c\} \\ 
+Ç &	$\backslash$c\{C\} \\
+
+\end{tabular}
+
+\subsection{Cabeçalhos e Preâmbulos de um Documento}
+\subsubsection{Título e Autor}
+\subsubsection{Índices}
+\subsection{Texto Formatado}
+\subsection{Texto não formatado}
+\subsection{Listas}
+\subsubsection{Itens}
+\subsubsection{Descritivas}
+\subsubsection{Numeradas}
+\subsection{Macros pré-definidas}
+\subsection{Comentários}
+\subsection{Links}
+\section{Estruturas de Dados}
+\section{Algoritmos}
+
+\chapter{Codificação e Testes}
+\section{Alternativas, Decisões e Problemas de Implementação}
+\section{Testes realizados e Resultados}
+Mostram-se a seguir alguns testes feitos (valores introduzidos) e
+os respectivos resultados obtidos:
+
+%\VerbatimInput{teste1.txt}
+
+
+\chapter{Conclusão}
+Síntese do Documento.\\
+Estado final do projecto; Análise crítica dos resultados.\\
+Trabalho futuro.
+
+%\appendix
+%\chapter{Código do Programa}
+%Lista-se a seguir o código \textsf{C} do programa que foi desenvolvido.
+%\VerbatimInput{ex1.c}
+
+\end{document}
