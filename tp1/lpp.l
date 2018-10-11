@@ -20,23 +20,26 @@
 %x BODY
 %x BODY_HEADER
 %x DOCTYPE
+%x LIST_ENUMERATE
+%x LIST_ITEMIZE
 %x TITLE
+%x VERBATIM
 
 %%
 ^\s*$ {
     printf("\\begin{document}");
-    BEGIN(BODY);
+    yy_push_state(BODY);
 }
 
-^=author=\[        BEGIN(TITLE);
-^=doctype=\[       BEGIN(DOCTYPE);
-^=title=\[         BEGIN(TITLE);
+^=author=\[        yy_push_state(AUTHOR);
+^=doctype=\[       yy_push_state(DOCTYPE);
+^=title=\[         yy_push_state(TITLE);
 
 <AUTHOR>[^\]]+     printf("\\author{%s}", yytext);
 <DOCTYPE>[^\]]+    printf("\\documentclass{%s}", yytext);
 <TITLE>[^\]]+      printf("\\title{%s}", yytext);
 
-<TITLE,AUTHOR,DOCTYPE>\]$    BEGIN(INITIAL);
+<TITLE,AUTHOR,DOCTYPE>\]$    yy_pop_state();
 
 <BODY_HEADER>[^#\n]*$          {
     nh--;
@@ -45,11 +48,20 @@
 
     printf("\\%s{%s}", chaps[nh], yytext);
     nh = 0;
-    BEGIN(BODY);
+    yy_pop_state();
 }
 
-<BODY>^#+                     { nh = yyleng; BEGIN(BODY_HEADER); }
+<BODY>\\begin\{verbatim\}          { ECHO; yy_push_state(VERBATIM); }
+<BODY>^#+                     { nh = yyleng; yy_push_state(BODY_HEADER); }
 <BODY>.|\n                   ECHO;
+
+<VERBATIM>\\end\{verbatim\}   { ECHO; yy_pop_state(); }
+<VERBATIM>[^}] ECHO;
+
+:\n/\.         { yy_push_state(LIST_ENUMERATE); }
+:\n/\.[0-9]    { yy_push_state(LIST_ITEMIZE);   }
+
+<LIST_ENUMERATE,LIST_ITEMIZE>^=$ { yy_pop_state(); }
 
 <<EOF>> {
     puts("\\end{document}");

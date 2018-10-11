@@ -11,3 +11,22 @@ fasdfasfd
 sadfa
 sdf
 asdf
+
+\begin{verbatim}
+### tudo o que
+}}
+    tiver ca dentro:
+. deve
+.1 ficar igual
+\end{verbatim}
+
+:
+. cenas
+. outras cenas
+=
+
+cenas aqui:
+altamente
+.1 cenas
+.1 outras cenas
+=
