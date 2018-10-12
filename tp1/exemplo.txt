@@ -1,4 +1,4 @@
-=doctype=[repport]
+=doctype=[report]
 =title=[o titulo]
 =author=[um autor \and outro autor]
 
@@ -23,6 +23,12 @@ asdf
 :
 . cenas
 . outras cenas
+=
+
+:
+.1 primeiro isto
+.1 depois isto
+.2 e depois aquilo
 =
 
 cenas aqui:

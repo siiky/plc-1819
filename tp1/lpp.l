@@ -1,9 +1,25 @@
 %{
-#include <assert.h>
+#define NDEBUG
 
-    /* Declaracoes C diversas */
-    int nh = 0;
-    char * chaps[] = {
+#ifndef NDEBUG
+#define stpush(ST) \
+    do {                                       \
+        fprintf(stderr, "*** PUSH %s\n", #ST); \
+        yy_push_state(ST);                     \
+    } while (0)
+
+#define stpop() \
+    do {                              \
+        fprintf(stderr, "*** POP\n"); \
+        yy_pop_state();               \
+    } while (0)
+#else
+#define stpush yy_push_state
+#define stpop yy_pop_state
+#endif
+
+    /* Supported LaTeX header tags */
+    static const char * chaps[] = {
         "chapter",
         "section",
         "subsection",
@@ -11,7 +27,12 @@
         "paragraph",
         "subparagraph",
     };
+
+    /* Number of supported LaTeX header tags */
     static const unsigned nc = sizeof(chaps) / sizeof(*chaps);
+
+    /* Header level, 0-nc */
+    int nh = 0;
 %}
 
 %option stack
@@ -27,44 +48,53 @@
 
 %%
 ^\s*$ {
+    /*
+     * An empty line starts the body of the document,
+     * so all the headers must come before any empty line
+     */
     printf("\\begin{document}");
-    yy_push_state(BODY);
+    stpush(BODY);
 }
 
-^=author=\[        yy_push_state(AUTHOR);
-^=doctype=\[       yy_push_state(DOCTYPE);
-^=title=\[         yy_push_state(TITLE);
+^=author=\[  stpush(AUTHOR);
+^=doctype=\[ stpush(DOCTYPE);
+^=title=\[   stpush(TITLE);
 
-<AUTHOR>[^\]]+     printf("\\author{%s}", yytext);
-<DOCTYPE>[^\]]+    printf("\\documentclass{%s}", yytext);
-<TITLE>[^\]]+      printf("\\title{%s}", yytext);
+<AUTHOR>[^\]\n]+  printf("\\author{%s}",        yytext);
+<DOCTYPE>[^\]\n]+ printf("\\documentclass{%s}", yytext);
+<TITLE>[^\]\n]+   printf("\\title{%s}",         yytext);
 
-<TITLE,AUTHOR,DOCTYPE>\]$    yy_pop_state();
+<TITLE,AUTHOR,DOCTYPE>\]$ stpop();
 
-<BODY_HEADER>[^#\n]*$          {
-    nh--;
-    if (((unsigned) nh) >= nc)
+<BODY_HEADER>[^#\n]*$ {
+    /* Make sure `nh` is in bounds */
+    if (((unsigned) --nh) >= nc)
         nh = nc - 1;
 
     printf("\\%s{%s}", chaps[nh], yytext);
     nh = 0;
-    yy_pop_state();
+    stpop();
 }
 
-<BODY>\\begin\{verbatim\}          { ECHO; yy_push_state(VERBATIM); }
-<BODY>^#+                     { nh = yyleng; yy_push_state(BODY_HEADER); }
-<BODY>.|\n                   ECHO;
+<BODY>\\begin\{verbatim\} { ECHO; stpush(VERBATIM); }
+<BODY>^#+                 { nh = yyleng; stpush(BODY_HEADER); }
+<BODY>:/\n\.              { printf("\\begin{itemize}");   stpush(LIST_ITEMIZE);   }
+<BODY>:/\n\.[0-9]         { printf("\\begin{enumerate}"); stpush(LIST_ENUMERATE); }
+<BODY>.|\n                ECHO;
 
-<VERBATIM>\\end\{verbatim\}   { ECHO; yy_pop_state(); }
-<VERBATIM>[^}] ECHO;
+<VERBATIM>\\end\{verbatim\} { ECHO; stpop(); }
+<VERBATIM>.|\n              ECHO;
 
-:\n/\.         { yy_push_state(LIST_ENUMERATE); }
-:\n/\.[0-9]    { yy_push_state(LIST_ITEMIZE);   }
+<LIST_ITEMIZE>^\.\s*         { printf("\\item "); }
+<LIST_ENUMERATE>^\.[0-9]+\s* { printf("\\item "); }
 
-<LIST_ENUMERATE,LIST_ITEMIZE>^=$ { yy_pop_state(); }
+<LIST_ENUMERATE,LIST_ITEMIZE>.|\n ECHO;
+
+<LIST_ENUMERATE>^\s*=\s*$ { printf("\\end{enumerate}"); stpop(); }
+<LIST_ITEMIZE>^\s*=\s*$   { printf("\\end{itemize}");   stpop(); }
 
 <<EOF>> {
-    puts("\\end{document}");
+    printf("\\end{document}");
     /* Se nao acabarmos a funcao, o programa fica em loop */
     return 0;
 }
