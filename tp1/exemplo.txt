@@ -7,7 +7,7 @@ asdfasdfasdfas
 #### um titulo
 #a
 sd
-fasdfasfd
+fa \it{sdf}asfd
 sadfa
 sdf
 asdf
@@ -21,18 +21,25 @@ asdf
 \end{verbatim}
 
 :
+.[primeiro] cenas e \bf{coisas}
+.[terceiro] coisas e cenas.
+.[ segundo] tretas
+.[segunda] asda
+=
+
+:
 . cenas
-. outras cenas
+. outras \emph{cenas}
 =
 
 :
 .1 primeiro isto
-.1 depois isto
+.1 sdepois \it{isto}
 .2 e depois aquilo
 =
 
 cenas aqui:
 altamente
 .1 cenas
-.1 outras cenas
+.1 soutras cenas
 =
