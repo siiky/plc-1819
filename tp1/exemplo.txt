@@ -12,13 +12,47 @@ sadfa
 sdf
 asdf
 
-\begin{verbatim}
+cena estranha \it{qq cena com \bf{bold}}
+cena estranha2 \bf{to be conti\it{nued}}
+
+há coisas muito Çuraçãáõ
+
+
+
+\sic{...} = não modifica o argumento
+\cao = ção
+\coes = ções
+1\.a = 1ª
+2\.o = 2º
+\ENDINGS =
+
+\’a - á 
+\'a - à 
+\~a - ã 
+\^a - â 
+\'e - é 
+\^e - ê 
+\’{\i} - í 
+\’I - Í 
+\’o - ó 
+\~o - õ 
+\^o - ô 
+\’u - ú 
+\"u - ü 
+\c{c} - ç 
+\c{C} - Ç 
+
+1º 2º e 3564ª
+
+
+
+\bverb
 ### tudo o que
 }}
-    tiver ca dentro:
+    tiver cá dentro:
 . deve
 .1 ficar igual
-\end{verbatim}
+\everb
 
 :
 .[primeiro] cenas e \bf{coisas}

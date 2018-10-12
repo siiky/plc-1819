@@ -48,9 +48,40 @@
 %x VERBATIM
 %x BOLD
 %x ITALIC
-%x EMPH
 
 %%
+
+<INITIAL,
+ AUTHOR,
+ BODY,
+ BODY_HEADER,
+ DOCTYPE,
+ LIST_ENUMERATE,
+ LIST_ITEMIZE,
+ LIST_DESCRIPTION,
+ TITLE,
+ BOLD,
+ ITALIC>{
+         á       { printf("\\'a");} 
+         à       { printf("\\`a");} 
+         ã       { printf("\\~a");}
+         â       { printf("\\^a");}
+         é       { printf("\\'e");}
+         ê       { printf("\\^e");}
+         í       { printf("\\'{\\i}");}
+         Í       { printf("\\'I");}
+         ó       { printf("\\'o");}
+         õ       { printf("\\~o");}
+         ô       { printf("\\^o");}
+         ú       { printf("\\'u");}
+         ç       { printf("\\c{c}");}
+         Ç       { printf("\\c{C}");}
+         [0-9]+ª { yytext[yyleng-2]='\0'; printf("%s\\textordfeminine",yytext);}
+         [0-9]+º { yytext[yyleng-2]='\0'; printf("%s\\textordmasculine",yytext);}
+        }
+
+
+
 ^\s*$ {
     /*
      * An empty line starts the body of the document,
@@ -80,18 +111,17 @@
     stpop();
 }
 
-<BODY>\\begin\{verbatim\} { ECHO; stpush(VERBATIM); }
+<BODY>\\bverb             { printf("\\begin{verbatim}"); stpush(VERBATIM); }
 <BODY>^#+                 { nh = yyleng; stpush(BODY_HEADER); }
 <BODY>:/\n\.              { printf("\\begin{itemize}");   stpush(LIST_ITEMIZE);   }
 <BODY>:/\n\.[0-9]         { printf("\\begin{enumerate}"); stpush(LIST_ENUMERATE); }
 <BODY>:/\n\.\[            { printf("\\begin{description}"); stpush(LIST_DESCRIPTION);}
-<BODY>\\bf\{               { printf("\\textbf{"); stpush(BOLD); }
-<BODY>\\it\{               { printf("\\textit{"); stpush(ITALIC); }
-<BODY>\\emph\{             { printf("\\textemph{"); stpush(EMPH); }
+<BODY>\\bf\{              { printf("\\textbf{"); stpush(BOLD); }
+<BODY>\\it\{              { printf("\\textit{"); stpush(ITALIC); }
 
 <BODY>.|\n                ECHO;
 
-<VERBATIM>\\end\{verbatim\} { ECHO; stpop(); }
+<VERBATIM>\\everb         { printf("\\end{verbatim}"); stpop(); }
 <VERBATIM>.|\n              ECHO;
 
 <LIST_ITEMIZE>^\.\s*         { printf("\\item "); }
@@ -101,14 +131,14 @@
 <LIST_ENUMERATE,LIST_ITEMIZE,LIST_DESCRIPTION>.|\n      ECHO;
 <LIST_ENUMERATE,LIST_ITEMIZE,LIST_DESCRIPTION>\\bf\{    { printf("\\textbf{"); stpush(BOLD); }
 <LIST_ENUMERATE,LIST_ITEMIZE,LIST_DESCRIPTION>\\it\{    { printf("\\textit{"); stpush(ITALIC); }
-<LIST_ENUMERATE,LIST_ITEMIZE,LIST_DESCRIPTION>\\emph\{  { printf("\\textemph{"); stpush(EMPH); }
-
 
 <LIST_ENUMERATE>^\s*=\s*$    { printf("\\end{enumerate}"); stpop(); }
 <LIST_ITEMIZE>^\s*=\s*$      { printf("\\end{itemize}");   stpop(); }
 <LIST_DESCRIPTION>^\s*=\s*$  { printf("\\end{description}"); stpop(); }
 
-<BOLD,ITALIC,EMPH>[^\}]*\}        {ECHO; stpop();}
+<ITALIC>\\bf\{               { printf("\\textbf{"); stpush(BOLD); }
+<BOLD>\\it\{                 { printf("\\textit{"); stpush(ITALIC); }
+<BOLD,ITALIC>[^\("\bf"|"\it")}]*\}        { ECHO; stpop(); }
 
 
 <<EOF>> {
