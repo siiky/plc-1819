@@ -111,7 +111,8 @@
     stpop();
 }
 
-<BODY>\\bverb             { printf("\\begin{verbatim}"); stpush(VERBATIM); }
+<BODY>^=indice=		  { printf("\\tableofcontents");}
+<BODY>\\bverb[ ]             { printf("\\begin{verbatim}"); stpush(VERBATIM); }
 <BODY>^#+                 { nh = yyleng; stpush(BODY_HEADER); }
 <BODY>:/\n\.              { printf("\\begin{itemize}");   stpush(LIST_ITEMIZE);   }
 <BODY>:/\n\.[0-9]         { printf("\\begin{enumerate}"); stpush(LIST_ENUMERATE); }
