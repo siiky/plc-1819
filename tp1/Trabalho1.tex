@@ -7,6 +7,7 @@
 \usepackage[latin1]{inputenc}
 \usepackage{url}
 \usepackage{enumerate}
+\usepackage{subcaption}
 
 \usepackage{float} %package para introduzir a figura exactamente onde queremos no doc
 \usepackage{graphicx} %package para utilizar imagens em latex
@@ -316,13 +317,116 @@ Já dentro do estado BODY, ou seja, dentro do conteúdo do documento, o analisador
 \section{Algoritmos}
 
 \chapter{Codificação e Testes}
-\section{Alternativas, Decisões e Problemas de Implementação}
+
 \section{Testes realizados e Resultados}
-Mostram-se a seguir alguns testes feitos (valores introduzidos) e
-os respectivos resultados obtidos:
+Nesta secção encontra-se os resultados do nosso analisador léxico no seguinte formato:
+\begin{itemize}
+\item Subsecções que se referem a um tipo de conversão de \LS para \LaTeX;
+\item Cada subsecção é formado por duas imagens, onde a da esquerda é o input no do nosso analisador léxico em \LS e a da direita é o output em \LaTeX;
+\end{itemize}
 
-%\VerbatimInput{teste1.txt}
+\subsection{Doctype, Titl e Autor}
 
+\begin{figure}[h!]
+  	\centering
+   	\begin{tabular}[b]{0.4\linewidth}
+    	\includegraphics[width=\linewidth]{header.png}
+     	\caption{\LS}
+   	\end{subfigure}
+  	\begin{subfigure}[b]{0.4\linewidth}
+    	\includegraphics[width=\linewidth]{header_latex.png}
+    	\caption{\LaTeX}
+  	\end{tabular}
+  	\caption{Conversão de cabeçalho e preâmbulo}
+\end{figure}
+	
+
+
+\subsection{Caracteres Especiais}
+
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}[b]{c}
+    \includegraphics[width=0.1\linewidth]{char_especiais.png} \\
+    \small (a)
+  \end{tabular} \qquad
+  \begin{tabular}[b]{c}
+    \includegraphics[width=.1\linewidth]{char_especiais_latex.png} \\
+    \small (b)
+  \end{tabular}
+  \caption{Conversão de cabeçalho e preâmbulo}
+\end{figure}
+
+
+\subsection{Lista Numeradas}
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}[b]{c}
+    \includegraphics[width=0.2\linewidth]{lista_enum.png} \\
+    \small (a)
+  \end{tabular} \qquad
+  \begin{tabular}[b]{c}
+    \includegraphics[width=.2\linewidth]{lista_enum_latex.png} \\
+    \small (b)
+  \end{tabular}
+  \caption{Conversão de lista numeradas}
+\end{figure}
+
+\subsection{Lista de Itens}
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}[b]{c}
+    \includegraphics[width=0.3\linewidth]{lista_item.png} \\
+    \small (a)
+  \end{tabular} \qquad
+  \begin{tabular}[b]{c}
+    \includegraphics[width=.3\linewidth]{lista_item_latex.png} \\
+    \small (b)
+  \end{tabular}
+  \caption{Conversão de lista de itens}
+\end{figure}
+
+\subsection{Lista Descritivas}
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}[b]{c}
+    \includegraphics[width=0.3\linewidth]{lista_desc.png} \\
+    \small (a)
+  \end{tabular} \qquad
+  \begin{tabular}[b]{c}
+    \includegraphics[width=.3\linewidth]{lista_desc_latex.png} \\
+    \small (b)
+  \end{tabular}
+  \caption{Conversão de lista descritivas}
+\end{figure}
+
+\subsection{Verbatim}
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}[b]{c}
+    \includegraphics[width=0.3\linewidth]{verbatim.png} \\
+    \small (a)
+  \end{tabular} \qquad
+  \begin{tabular}[b]{c}
+    \includegraphics[width=.3\linewidth]{verbatim_latex.png} \\
+    \small (b)
+  \end{tabular}
+  \caption{Conversão de sintaxe verbatim}
+\end{figure}
+
+\subsection{Níveis de secção}
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}[b]{c}
+    \includegraphics[width=0.3\linewidth]{capitulo.png} \\
+    \small (a)
+  \end{tabular} \qquad
+  \begin{tabular}[b]{c}
+    \includegraphics[width=.4\linewidth]{capitulo_latex.png} \\
+    \small (b)
+  \end{tabular}
+  \caption{Conversão de níveis de secção}
+\end{figure}
 
 \chapter{Conclusão} \label{concl}
 Síntese do Documento~\cite{Martini2016a,Hoare73a}.\\
