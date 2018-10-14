@@ -1,79 +1,62 @@
 =doctype=[report]
-=title=[o titulo]
-=author=[um autor \and outro autor]
+=title=[Trabalho 1 (testes)]
+=author=[André Sá \and João Bastos \and Pedro Sá]
 
-aksdhflas dflajshdfkasdf
-asdfasdfasdfas
-#### um titulo
-#a
-sd
-fa \it{sdf}asfd
-sadfa
-sdf
-asdf
+área
+àquele
+vão
+Lâmpada
+ética
+paciência
+índice
+Índice
+Póvoa
+verão
+avô
+saúde
+acção
+11º
+89ª
 
-cena estranha \it{qq cena com \bf{bold}}
-cena estranha2 \bf{to be conti\it{nued}}
+#Primeiro Capítulo
+##Secção
 
-há coisas muito Çuraçãáõ
+Teste de lista enumerada:
+.1 Com \bf{bold} dentro
+.2 ponto 2
+.3 com \it{texto} em itálico
+.4 outros
+=
+
+
+###Sub-secção
+
+Teste de lista de itens:
+. pão
+. salada
+. frango
+=
+
+####Sub-subsecção
+
+Teste de lista descritiva:
+.[primeiro] item1
+.[ segundo] item2
+.[outros] item3
+=
+
+#####Parágrafo
 
 
 
-\sic{...} = não modifica o argumento
-\cao = ção
-\coes = ções
-1\.a = 1ª
-2\.o = 2º
-\ENDINGS =
-
-\’a - á 
-\'a - à 
-\~a - ã 
-\^a - â 
-\'e - é 
-\^e - ê 
-\’{\i} - í 
-\’I - Í 
-\’o - ó 
-\~o - õ 
-\^o - ô 
-\’u - ú 
-\"u - ü 
-\c{c} - ç 
-\c{C} - Ç 
-
-1º 2º e 3564ª
-
+######Sub-parágrafo
 
 
 \bverb
-### tudo o que
-}}
-    tiver cá dentro:
-. deve
-.1 ficar igual
+ tudo o que estiver cá dentro:
+ .1 fica igual
+ =
 \everb
 
-:
-.[primeiro] cenas e \bf{coisas}
-.[terceiro] coisas e cenas.
-.[ segundo] tretas
-.[segunda] asda
-=
 
-:
-. cenas
-. outras \emph{cenas}
-=
 
-:
-.1 primeiro isto
-.1 sdepois \it{isto}
-.2 e depois aquilo
-=
-
-cenas aqui:
-altamente
-.1 cenas
-.1 soutras cenas
-=
