@@ -2,6 +2,8 @@
 =title=[Trabalho 1 (testes)]
 =author=[André Sá \and João Bastos \and Pedro Sá]
 
+=indice=
+
 área
 àquele
 vão
@@ -53,6 +55,7 @@ Teste de lista descritiva:
 
 
 \bverb
+sdasdas
  tudo o que estiver cá dentro:
  .1 fica igual
  =

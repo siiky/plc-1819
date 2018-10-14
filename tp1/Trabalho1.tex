@@ -1,0 +1,357 @@
+%
+% Layout retirado de http://www.di.uminho.pt/~prh/curplc09.html#notas
+%
+\documentclass{report}
+\usepackage[portuges]{babel}
+%\usepackage[utf8]{inputenc}
+\usepackage[latin1]{inputenc}
+\usepackage{url}
+\usepackage{enumerate}
+
+\usepackage{float} %package para introduzir a figura exactamente onde queremos no doc
+\usepackage{graphicx} %package para utilizar imagens em latex
+\graphicspath{ {images/} } %folder onde tem as imagens
+\usepackage{wrapfig}
+
+
+%\usepackage{alltt}
+%\usepackage{fancyvrb}
+\usepackage{listings}
+%LISTING - GENERAL
+\lstset{
+	language=C,
+	basicstyle=\small,
+	numbers=left,
+	numberstyle=\tiny,
+	numbersep=5pt,
+	breaklines=true,
+    frame=tB,
+	mathescape=true,
+	escapeinside={(*@}{@*)}
+}
+
+%
+%\lstset{ %
+%	language=Java,							% choose the language of the code
+%	basicstyle=\ttfamily\footnotesize,		% the size of the fonts that are used for the code
+%	keywordstyle=\bfseries,					% set the keyword style
+%	%numbers=left,							% where to put the line-numbers
+%	numberstyle=\scriptsize,				% the size of the fonts that are used for the line-numbers
+%	stepnumber=2,							% the step between two line-numbers. If it's 1 each line
+%											% will be numbered
+%	numbersep=5pt,							% how far the line-numbers are from the code
+%	backgroundcolor=\color{white},			% choose the background color. You must add \usepackage{color}
+%	showspaces=false,						% show spaces adding particular underscores
+%	showstringspaces=false,					% underline spaces within strings
+%	showtabs=false,							% show tabs within strings adding particular underscores
+%	frame=none,								% adds a frame around the code
+%	%abovecaptionskip=-.8em,
+%	%belowcaptionskip=.7em,
+%	tabsize=2,								% sets default tabsize to 2 spaces
+%	captionpos=b,							% sets the caption-position to bottom
+%	breaklines=true,						% sets automatic line breaking
+%	breakatwhitespace=false,				% sets if automatic breaks should only happen at whitespace
+%	title=\lstname,							% show the filename of files included with \lstinputlisting;
+%											% also try caption instead of title
+%	escapeinside={\%*}{*)},					% if you want to add a comment within your code
+%	morekeywords={*,...}					% if you want to add more keywords to the set
+%}
+
+\usepackage{xspace}
+
+\parindent=0pt
+\parskip=2pt
+
+\setlength{\oddsidemargin}{-1cm}
+\setlength{\textwidth}{18cm}
+\setlength{\headsep}{-1cm}
+\setlength{\textheight}{23cm}
+
+
+
+\def\LS{\textbf{\emph{LS}}}
+
+
+%%%%\input{LPgeneralDefintions}
+
+\title{Processamento de Linguagens e Compiladores\\\textbf{Pré-processador para \LaTeX}\\ Relatório de Desenvolvimento}
+\author{André Sá (76361) \and João Bastos (47419) \and Pedro Sá (78164)}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+O trabalho apresentado consiste na criação de um facilitador à criação e edição de documentos em \LaTeX\ recorrendo a uma linguagem mais simplificada e um pré-processador que faz a correspondente "tradução" para \LaTeX.
+\end{abstract}
+
+\tableofcontents
+
+\chapter{Introdução} \label{intro}
+\section{Enquadramento}
+O \LaTeX\ é um sistema tipográfico, bastante útil e completo, para a produção de todo o tipo de documentos. Porém, a edição do documento pode-se tornar morosa devido ao peso das marcas (comandos do \LaTeX) necessárias para anotar o texto.\\
+O trabalho realizado teve como premissa precisamente facilitar a escrita de documentos em \LaTeX\ simplificando certas anotações de forma, conteúdo ou formato. Assim, foi criada uma linguagem mais simples baseada na ferramenta PPP\footnote{PPP (Ptext PreProcessor) - http://www4.di.uminho.pt/~jcr/AULAS/plc2008/tp1/ppp.html} e o respetivo pré-processador, recorrendo ao Lex, que substitui essa notação simplificada pelas marcas finais corretas.
+
+\section{Estrutura do Relatório}
+Neste relatório começamos com a Introdução (Capítulo 1) onde, de uma forma breve tentamos descrever em \\
+
+
+Explicar como está organizado o documento, referindo os capítulos existentes em~\cite{Pereira201635}
+e a sua articulação explicando o conteúdo de cada um.
+No capítulo~\ref{ae} faz-se uma análise detalhada do problema proposto
+de modo a poder-se especificar  as entradas, resultados e formas de transformação.\\
+etc. \ldots\\
+No capítulo~\ref{concl} termina-se o relatório com uma síntese do que foi dito,
+as conclusões e o trabalho futuro
+
+
+\chapter{Análise e Especificação}
+\section{Descrição informal do problema}
+Foi-nos proposto especificar uma linguagem de anotação para abreviar a escrita de formatação e listas de tópicos em \LaTeX\ após investigar os pré-processadores PPP.
+De seguida criar, com a ferramenta Flex, um processador que transforme a notação referida em \LaTeX. 
+\section{Especificação dos Requisitos}
+\subsection{Dados}
+\subsection{Pedidos}
+\subsection{Relações}
+
+\chapter{Linguagem Simplificada}
+Neste capítulo indicaremos a sintaxe definida nesta \textbf{Linguagem Simplificada}, doravante representada por \LS, para os diferentes aspectos. Em cada caso iremos apresentar na forma de tabelas a sintaxe na \LS\ e a correspondência em \LaTeX.
+
+
+\subsection{Acentos e Cedilhas}
+Esta será a maior mais-valia desta ferramenta devido à acentuação e cedilhas presentes na língua portuguesa que obrigavam em \LaTeX\ à constante notação sobre palavras travando a fluidez na escrita. \\  
+
+\begin{tabular}{c l}
+\LS & \LaTeX \\
+\hline
+á &	\verb!\'a! \\
+à & \verb!\`a! \\
+ã & \verb!\~a! \\
+â & \verb!\^a! \\
+é & \verb!\'e! \\
+ê &	\verb!\^e! \\
+í &	\verb!\{\i}! \\
+Í &	\verb!\'I! \\
+ó &	\verb!\'o! \\
+õ & \verb!\~o! \\
+ô & \verb!\^o! \\
+ú &	\verb!\'u! \\
+ü &	\verb!\"u! \\
+ç &	\verb!\c{c}! \\ 
+Ç &	\verb!\c{C}! \\
+\end{tabular}
+
+
+\subsection{Cabeçalhos e Preâmbulos}
+
+\subsubsection{Tipo de Documento}
+Ao iniciar o documento, o \LaTeX\ necessita saber qual o layout mediante o tipo de documento que pretendemos.\\Na \LS\ usaremos a seguinte sintaxe sendo o comando introduzido no início da linha:\\
+
+\begin{tabular}{l l}
+\LS & \LaTeX \\
+\hline
+\verb!=doctype=[tipo_de_documento]! &  \verb!\documentclass{tipo_de_documento}!\\
+\end{tabular}
+
+Foi definido que o corpo do documento só será iniciado quando for encontrada a primeira linha em branco pelo que antes disso cabe ao utilizador começar o ficheiro com introdução do tipo de documento, título e autores.
+
+
+\subsubsection{Título e Autor}
+O título e autores do documento são escritos no início de linha com a seguinte sintaxe:
+
+\begin{tabular}{l l}
+\LS & \LaTeX \\
+\hline
+\verb!=title=[título]! &  \verb!\title{título}!\\
+\verb!=author=[autor1 \and autor2 \and ...]! &  \verb!\author{autor1 \and autor2 \and ...}!\\
+\end{tabular}
+
+
+\subsubsection{Índices}
+O índice é gerado no local onde o respectivo comando é introduzido sendo possível definir o local no documento onde o pretendemos, no entanto de momento apenas é possível gerar um índice por documento. O comando deverá ser introduzido no ínicio da linha. A sintaxe é a seguinte:\\
+
+\begin{tabular}{l l}
+\LS & \LaTeX \\
+\hline
+\verb!=indice=! & \verb!\tableofcontents!\\
+\end{tabular}
+
+
+\subsubsection{Secções e Sub-secções}
+As secções e os diversos níveis de sub-secções são introduzidos iniciando uma linha com os "=" seguido do nome da secção ou subsecção, sendo a sua numeração gerada automaticamente.\\
+O nível da secção corresponde ao número de "="'s introduzidos.\\
+
+\begin{tabular}{l l l}
+Nível & \LS & \LaTeX \\
+\hline
+1 &	\verb!=capítulo! &  \verb!\chapter{capítulo}!\\
+2 & \verb!==secção! &  \verb!\section{secção}!\\
+3 & \verb!===sub-secção! &  \verb!\subsection{sub-secção}!\\
+4 & \verb!====sub-subsecção! &  \verb!\subsubsection{sub-subsecção}!\\
+5 & \verb!=====parágrafo! &  \verb!\paragraph{parágrafo}!\\
+\end{tabular}
+
+
+\subsection{Texto formatado}
+Qualquer pedaço de texto pode ser formatado em Italico ou Bold. Para tal colocamos o texto que pretendemos formatar dentro dos respectivos comandos tal como exemplificamos de seguida.
+
+\subsubsection{Itálico}
+\begin{tabular}{l l}
+\LS & \LaTeX \\
+\hline
+\verb!\it{texto}! & \verb!\textit{texto}! \\
+\end{tabular}
+
+\subsubsection{Bold}
+\begin{tabular}{l l}
+\LS & \LaTeX \\
+\hline
+\verb!\bf{texto}! & \verb!\textbf{texto}! \\
+\end{tabular}
+\subsection{Texto não formatado}
+Para quando é necessário ter como input exactamente o que foi escrito o \LaTeX tem o comando Verbatim que optamos por simplificar da seguinte forma:\\
+
+\begin{tabular}{l l}
+\LS & \LaTeX \\
+\hline
+\verb!\bverb texto \everb! & \verb!\begin{verbatim} texto \end{verbatim}! \\
+
+\end{tabular}
+
+
+\subsection{Listas}
+Existem três tipos de listas suportadas pela \LS.
+Cada um destes comandos são iniciados por ":" no final de uma linha.
+Sendo que nos últimos
+\subsubsection{Itens}
+Utilizaremos uma descrição por itens para descrever este comando:
+\begin{itemize}
+\item Iniciado por ":" no final de uma linha;
+\item Cada item será iniciado no ínicio de cada linha por "." seguido de um caracter diferente de "[" ou dígito;
+\item Termina com o caracter "\#".
+\end{itemize}
+
+\subsubsection{Descritivas}
+Utilizaremos uma lista descritiva para descrever este comando:
+
+\begin{description}
+\item[Primeiro] Iniciado por ":" no final de uma linha;
+\item[Segundo] Cada item será iniciado no ínicio de cada linha por "." seguido de uma ou mais palavras entre "[" e "]";
+\item [Terceiro] Termina com o caracter "\#".
+\end{description}
+
+\subsubsection{Numeradas}
+Utilizaremos uma lista numerada para descrever este comando:
+
+\begin{enumerate}
+\item Iniciado por ":" no final de uma linha;
+\item Cada item será inicado no ínicio de cada linha por "." seguido de um dígito;
+\item Termina com o caracter "\#".
+\end{enumerate}
+
+
+\subsection{Macros}
+Foram definidas duas macros relacionadas com indicador de ordem em feminino e masculino. Bastará escrever o que se pretende como input que a tradução em \LaTeX\ será feita.\\
+
+\begin{tabular}{l l}
+\LS & \LaTeX \\
+\hline
+\verb!8º! & \verb!8\textordmasculine! \\
+\verb!11ª! & \verb!11\textordfeminine! \\
+\end{tabular}
+
+
+
+\chapter{Concepção/desenho da Resolução}
+
+\paragraph{Início e Fim do documento}
+No ficheiro flex elaborado optamos por manipulação directa da stack de estados utilizando as funções \verb!yy_push_state! e \verb!yy_pop_state!. Para tal introduzimos "\verb!%option stack!" para além dos estados por nós definidos, como se pode verificar na Figura~\ref{estados}.
+
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+  \begin{center}
+    \includegraphics[width=0.15\textwidth]{01.png}
+  \end{center}
+  \caption{Estados\label{estados}}
+\end{wrapfigure}
+
+Como podemos verificar pela Figura~\ref{inicio}, ao iniciar, o analisador léxico encontrará a indicação do tipo de documento, titulo e autores e só após encontrar a primeira linha em branco irá passar para o estado BODY que vai conter todo o conteúdo do documento.
+Encontrando o EOF é introduzido o comando para o fim do documento em \LaTeX\ (Figura~\ref{eof}).
+
+
+%\begin{figure}[H]
+%  \centering
+%      \includegraphics[width=0.2\textwidth]{02.png}
+%  \caption{Estados DOCTYPE, TITLE, AUTHOR e BODY \label{inicio}}
+%\end{figure}
+
+\begin{wrapfigure}{c}{0.25\textwidth}
+  \begin{center}
+    \includegraphics[width=0.4\textwidth]{02.png}
+  \end{center}
+  \caption{Estados DOCTYPE, TITLE, AUTHOR e BODY\label{inicio}}
+\end{wrapfigure}
+
+\begin{wrapfigure}{c}{0.25\textwidth}
+  \begin{center}
+    \includegraphics[width=0.4\textwidth]{eof.png}
+  \end{center}
+  \caption{Fim do documento.\label{eof}}
+\end{wrapfigure}
+
+\paragraph{Conteúdo do Documento}
+Já dentro do estado BODY, ou seja, dentro do conteúdo do documento, o analisador léxico irá verificar se encontra correspondência para as restantes anotações de forma, conteúdo ou formato que iremos apresentar de seguida. Caso tenha correspondência é encaminhado para o estado devido (Figura~\ref{body}).
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{03.png}
+  \end{center}
+  \caption{Estado BODY e encaminhamento para os diferentes estados. \label{body}}
+\end{wrapfigure}
+
+
+
+\section{Estruturas de Dados}
+\section{Algoritmos}
+
+\chapter{Codificação e Testes}
+\section{Alternativas, Decisões e Problemas de Implementação}
+\section{Testes realizados e Resultados}
+Mostram-se a seguir alguns testes feitos (valores introduzidos) e
+os respectivos resultados obtidos:
+
+%\VerbatimInput{teste1.txt}
+
+
+\chapter{Conclusão} \label{concl}
+Síntese do Documento~\cite{Martini2016a,Hoare73a}.\\
+Estado final do projecto; Análise crítica dos resultados~\cite{Sto77a}.\\
+Trabalho futuro.
+
+\appendix
+\chapter{Código do Programa}
+
+%\lstinputlisting{lpp.l} %input de um ficheiro
+%\VerbatimInput{lpp.l}
+\bibliographystyle{alpha}
+%\bibliographystyle{plain}
+%\bibliographystyle{named}
+
+\bibliography{Trabalho1}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document} 
