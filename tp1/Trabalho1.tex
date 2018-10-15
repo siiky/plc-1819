@@ -90,37 +90,22 @@ O trabalho apresentado consiste na criação de um facilitador à criação e edição 
 \tableofcontents
 
 \chapter{Introdução} \label{intro}
-\section{Enquadramento}
+
+\section{Descrição informal do problema}
 O \LaTeX\ é um sistema tipográfico, bastante útil e completo, para a produção de todo o tipo de documentos. Porém, a edição do documento pode-se tornar morosa devido ao peso das marcas (comandos do \LaTeX) necessárias para anotar o texto.\\
-O trabalho realizado teve como premissa precisamente facilitar a escrita de documentos em \LaTeX\ simplificando certas anotações de forma, conteúdo ou formato. Assim, foi criada uma linguagem mais simples baseada na ferramenta PPP\footnote{PPP (Ptext PreProcessor) - http://www4.di.uminho.pt/~jcr/AULAS/plc2008/tp1/ppp.html} e o respetivo pré-processador, recorrendo ao Lex, que substitui essa notação simplificada pelas marcas finais corretas.
+O trabalho realizado teve como premissa precisamente facilitar a escrita de documentos em \LaTeX\ simplificando certas anotações de forma, conteúdo ou formato. Assim, foi criada uma linguagem mais simples baseada na ferramenta PPP\footnote{PPP (Ptext PreProcessor) - http://www4.di.uminho.pt/~jcr/AULAS/plc2008/tp1/ppp.html}. De seguida recorrendo à ferramenta Flex, criamos um processador que transforme a notação referida em \LaTeX. 
 
 \section{Estrutura do Relatório}
-Neste relatório começamos com a Introdução (Capítulo 1) onde, de uma forma breve tentamos descrever em \\
-
-
-Explicar como está organizado o documento, referindo os capítulos existentes em~\cite{Pereira201635}
-e a sua articulação explicando o conteúdo de cada um.
-No capítulo~\ref{ae} faz-se uma análise detalhada do problema proposto
-de modo a poder-se especificar  as entradas, resultados e formas de transformação.\\
-etc. \ldots\\
-No capítulo~\ref{concl} termina-se o relatório com uma síntese do que foi dito,
-as conclusões e o trabalho futuro
-
-
-\chapter{Análise e Especificação}
-\section{Descrição informal do problema}
-Foi-nos proposto especificar uma linguagem de anotação para abreviar a escrita de formatação e listas de tópicos em \LaTeX\ após investigar os pré-processadores PPP.
-De seguida criar, com a ferramenta Flex, um processador que transforme a notação referida em \LaTeX. 
-\section{Especificação dos Requisitos}
-\subsection{Dados}
-\subsection{Pedidos}
-\subsection{Relações}
+Neste relatório começamos com a Introdução (Capítulo 1) onde, de uma forma breve tentamos descrever o enquadramento do documento e a estrutura do mesmo. \\
+No capítulo 2 explicamos em que consiste a Linguagem Simplificada e no capítulo seguinte (Capítulo 3) a forma como desenvolvemos a ferramenta que utilizará as regras dessa linguagem para criar o ficheiro \LaTeX. \\
+O Capítulo 4 será composto pelos testes executados e no Capítulo 5 a Conclusão onde fazemos uma análise ao trabalho executado. \\
+Por último o documento tem o apêndice onde foi introduzido o código fonte do ficheiro Lex. 
 
 \chapter{Linguagem Simplificada}
 Neste capítulo indicaremos a sintaxe definida nesta \textbf{Linguagem Simplificada}, doravante representada por \LS, para os diferentes aspectos. Em cada caso iremos apresentar na forma de tabelas a sintaxe na \LS\ e a correspondência em \LaTeX.
 
 
-\subsection{Acentos e Cedilhas}
+\section{Acentos e Cedilhas}
 Esta será a maior mais-valia desta ferramenta devido à acentuação e cedilhas presentes na língua portuguesa que obrigavam em \LaTeX\ à constante notação sobre palavras travando a fluidez na escrita. \\  
 
 \begin{tabular}{c l}
@@ -143,10 +128,9 @@ Esta será a maior mais-valia desta ferramenta devido à acentuação e cedilhas pre
 Ç &	\verb!\c{C}! \\
 \end{tabular}
 
+\section{Cabeçalhos e Preâmbulos}
 
-\subsection{Cabeçalhos e Preâmbulos}
-
-\subsubsection{Tipo de Documento}
+\subsection{Tipo de Documento}
 Ao iniciar o documento, o \LaTeX\ necessita saber qual o layout mediante o tipo de documento que pretendemos.\\Na \LS\ usaremos a seguinte sintaxe sendo o comando introduzido no início da linha:\\
 
 \begin{tabular}{l l}
@@ -158,8 +142,8 @@ Ao iniciar o documento, o \LaTeX\ necessita saber qual o layout mediante o tipo 
 Foi definido que o corpo do documento só será iniciado quando for encontrada a primeira linha em branco pelo que antes disso cabe ao utilizador começar o ficheiro com introdução do tipo de documento, título e autores.
 
 
-\subsubsection{Título e Autor}
-O título e autores do documento são escritos no início de linha com a seguinte sintaxe:
+\subsection{Título e Autor}
+O título e autores do documento são escritos no início de linha com a seguinte sintaxe:\\
 
 \begin{tabular}{l l}
 \LS & \LaTeX \\
@@ -169,7 +153,7 @@ O título e autores do documento são escritos no início de linha com a seguinte s
 \end{tabular}
 
 
-\subsubsection{Índices}
+\subsection{Índices}
 O índice é gerado no local onde o respectivo comando é introduzido sendo possível definir o local no documento onde o pretendemos, no entanto de momento apenas é possível gerar um índice por documento. O comando deverá ser introduzido no ínicio da linha. A sintaxe é a seguinte:\\
 
 \begin{tabular}{l l}
@@ -179,7 +163,7 @@ O índice é gerado no local onde o respectivo comando é introduzido sendo possíve
 \end{tabular}
 
 
-\subsubsection{Secções e Sub-secções}
+\subsection{Secções e Sub-secções}
 As secções e os diversos níveis de sub-secções são introduzidos iniciando uma linha com os "=" seguido do nome da secção ou subsecção, sendo a sua numeração gerada automaticamente.\\
 O nível da secção corresponde ao número de "="'s introduzidos.\\
 
@@ -194,23 +178,23 @@ Nível & \LS & \LaTeX \\
 \end{tabular}
 
 
-\subsection{Texto formatado}
+\section{Texto formatado}
 Qualquer pedaço de texto pode ser formatado em Italico ou Bold. Para tal colocamos o texto que pretendemos formatar dentro dos respectivos comandos tal como exemplificamos de seguida.
 
-\subsubsection{Itálico}
+\subsection{Itálico}
 \begin{tabular}{l l}
 \LS & \LaTeX \\
 \hline
 \verb!\it{texto}! & \verb!\textit{texto}! \\
 \end{tabular}
 
-\subsubsection{Bold}
+\subsection{Bold}
 \begin{tabular}{l l}
 \LS & \LaTeX \\
 \hline
 \verb!\bf{texto}! & \verb!\textbf{texto}! \\
 \end{tabular}
-\subsection{Texto não formatado}
+\section{Texto não formatado}
 Para quando é necessário ter como input exactamente o que foi escrito o \LaTeX tem o comando Verbatim que optamos por simplificar da seguinte forma:\\
 
 \begin{tabular}{l l}
@@ -221,11 +205,11 @@ Para quando é necessário ter como input exactamente o que foi escrito o \LaTeX t
 \end{tabular}
 
 
-\subsection{Listas}
+\section{Listas}
 Existem três tipos de listas suportadas pela \LS.
 Cada um destes comandos são iniciados por ":" no final de uma linha.
 Sendo que nos últimos
-\subsubsection{Itens}
+\subsection{Itens}
 Utilizaremos uma descrição por itens para descrever este comando:
 \begin{itemize}
 \item Iniciado por ":" no final de uma linha;
@@ -233,7 +217,7 @@ Utilizaremos uma descrição por itens para descrever este comando:
 \item Termina com o caracter "\#".
 \end{itemize}
 
-\subsubsection{Descritivas}
+\subsection{Descritivas}
 Utilizaremos uma lista descritiva para descrever este comando:
 
 \begin{description}
@@ -242,7 +226,7 @@ Utilizaremos uma lista descritiva para descrever este comando:
 \item [Terceiro] Termina com o caracter "\#".
 \end{description}
 
-\subsubsection{Numeradas}
+\subsection{Numeradas}
 Utilizaremos uma lista numerada para descrever este comando:
 
 \begin{enumerate}
@@ -252,7 +236,7 @@ Utilizaremos uma lista numerada para descrever este comando:
 \end{enumerate}
 
 
-\subsection{Macros}
+\section{Macros}
 Foram definidas duas macros relacionadas com indicador de ordem em feminino e masculino. Bastará escrever o que se pretende como input que a tradução em \LaTeX\ será feita.\\
 
 \begin{tabular}{l l}
@@ -265,6 +249,179 @@ Foram definidas duas macros relacionadas com indicador de ordem em feminino e ma
 
 
 \chapter{Concepção/desenho da Resolução}
+Neste capítulo iremos descrever a concepção/desenho do analisador léxico iniciando cada secção com um pequeno resumo seguido do código referido.
+
+\section{Início e Fim do documento}
+No ficheiro flex elaborado optamos por manipulação directa da stack de estados utilizando as funções \verb!yy_push_state! e \verb!yy_pop_state!. Para tal introduzimos "\verb!%option stack!" para além dos estados por nós definidos, como se pode verificar na Figura~\ref{estados}.
+
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.15\textwidth]{01.png}
+  \caption{Estados\label{estados}}
+\end{figure}
+
+Como podemos verificar pela Figura~\ref{inicio}, ao iniciar, o analisador léxico encontrará a indicação do tipo de documento, titulo e autores e só após encontrar a primeira linha em branco irá passar para o estado BODY que vai conter todo o conteúdo do documento.
+Encontrando o EOF é introduzido o comando para o fim do documento em \LaTeX\ (Figura~\ref{eof}).
+
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.4\textwidth]{02.png}
+  \caption{Estados DOCTYPE, TITLE, AUTHOR e BODY\label{inicio}}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.4\textwidth]{eof.png}
+  \caption{Fim do documento.\label{eof}}
+\end{figure}
+
+
+
+\section{Conteúdo do Documento}
+Já dentro do estado BODY, ou seja, dentro do conteúdo do documento, o analisador léxico irá verificar se encontra correspondência para as restantes anotações de forma, conteúdo ou formato que iremos apresentar de seguida. Caso tenha correspondência é encaminhado para o estado devido (Figura~\ref{body}). Caso no início de uma linha encontre "=indice=" será impresso o comando \verb!\tableofcontents! que introduz o índice nesse mesmo local.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.6\textwidth]{03.png}
+  \caption{Estado BODY e encaminhamento para os diferentes estados. \label{body}}
+\end{figure}
+
+\section{Bold e Italic}
+Nestes 2 casos é feita uma simples substituição dos comandos e escrito tudo o que se encontra entre chavetas (Figura~\ref{bdit}).
+
+\begin{figure}[h!]
+  \centering
+      \includegraphics[width=0.45\textwidth]{bdit.png}
+  \caption{BOLD e ITALIC.\label{bdit}}
+\end{figure}
+
+\section{Verbatim}
+Depois de o analisador léxico encontrar o comando de inicialização substitui pelo correspondente em \LaTeX\ e faz ECHO até encontrar o comando de finalização que também substitui pelo correspondente (Figura~\ref{verb}).
+
+\begin{figure}[h!]
+  \centering
+      \includegraphics[width=0.4\textwidth]{verb.png}
+  \caption{VERBATIM.\label{verb}}
+\end{figure}
+
+\section{Listas}
+No estado BODY é encontrada a condição de inicialização de cada um dos três tipos de lista e impresso o respectivo comando de início. Daí o analisador léxico entra no respectivo estado e adiciona os itens no formato pretendido. Ao encontrar o "\#" imprime o comando de fecho do comando. Dentro destes três estados também se procura correspondência com os comandos de formatação itálico e bold de forma a poder ser aplicado também em listas (Figura~\ref{listas}).
+
+\begin{figure}[h!]
+  \centering
+      \includegraphics[width=0.6\textwidth]{listas.png}
+  \caption{Listas.\label{listas}}
+\end{figure}
+
+\section{Secções e Sub-secções}
+Existe um limite para os níveis de secções que podem ser criadas. Para resolver esse problema criamos uma função que, com auxílio de um apontador para um array de Strings, permite saber que nível pretendemos para imprimir o comando correcto e quando atinge o seu limite (Figura~\ref{seccao}.
+
+\begin{figure}[h!]
+  \centering
+   	\begin{subfigure}[b]{0.4\linewidth}
+    	\includegraphics[width=\linewidth]{seccao1.png}
+     	\caption{}
+   	\end{subfigure}
+  	
+  	\begin{subfigure}[b]{0.3\linewidth}
+    	\includegraphics[width=\linewidth]{seccao2.png}
+    	\caption{}
+  	\end{subfigure}
+  	
+  	\caption{BODY\_HEADER}
+  	\label{seccao}
+\end{figure}
+
+
+
+\chapter{Concepção/desenho da Resolução}
+Neste capítulo iremos descrever a concepção/desenho do analisador léxico iniciando cada secção com um pequeno resumo seguido do código referido.
+
+\section{Início e Fim do documento}
+No ficheiro flex elaborado optamos por manipulação directa da stack de estados utilizando as funções \verb!yy_push_state! e \verb!yy_pop_state!. Para tal introduzimos "\verb!%option stack!" para além dos estados por nós definidos, como se pode verificar na Figura~\ref{estados}.
+
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.15\textwidth]{01.png}
+  \caption{Estados\label{estados}}
+\end{figure}
+
+Como podemos verificar pela Figura~\ref{inicio}, ao iniciar, o analisador léxico encontrará a indicação do tipo de documento, titulo e autores e só após encontrar a primeira linha em branco irá passar para o estado BODY que vai conter todo o conteúdo do documento.
+Encontrando o EOF é introduzido o comando para o fim do documento em \LaTeX\ (Figura~\ref{eof}).
+
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.4\textwidth]{02.png}
+  \caption{Estados DOCTYPE, TITLE, AUTHOR e BODY\label{inicio}}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.4\textwidth]{eof.png}
+  \caption{Fim do documento.\label{eof}}
+\end{figure}
+
+
+
+\section{Conteúdo do Documento}
+Já dentro do estado BODY, ou seja, dentro do conteúdo do documento, o analisador léxico irá verificar se encontra correspondência para as restantes anotações de forma, conteúdo ou formato que iremos apresentar de seguida. Caso tenha correspondência é encaminhado para o estado devido (Figura~\ref{body}). Caso no início de uma linha encontre "=indice=" será impresso o comando \verb!\tableofcontents! que introduz o índice nesse mesmo local.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.6\textwidth]{03.png}
+  \caption{Estado BODY e encaminhamento para os diferentes estados. \label{body}}
+\end{figure}
+
+\section{Bold e Italic}
+Nestes 2 casos é feita uma simples substituição dos comandos e escrito tudo o que se encontra entre chavetas (Figura~\ref{bdit}).
+
+\begin{figure}[h!]
+  \centering
+      \includegraphics[width=0.45\textwidth]{bdit.png}
+  \caption{BOLD e ITALIC.\label{bdit}}
+\end{figure}
+
+\section{Verbatim}
+Depois de o analisador léxico encontrar o comando de inicialização substitui pelo correspondente em \LaTeX\ e faz ECHO até encontrar o comando de finalização que também substitui pelo correspondente (Figura~\ref{verb}).
+
+\begin{figure}[h!]
+  \centering
+      \includegraphics[width=0.4\textwidth]{verb.png}
+  \caption{VERBATIM.\label{verb}}
+\end{figure}
+
+\section{Listas}
+No estado BODY é encontrada a condição de inicialização de cada um dos três tipos de lista e impresso o respectivo comando de início. Daí o analisador léxico entra no respectivo estado e adiciona os itens no formato pretendido. Ao encontrar o "\#" imprime o comando de fecho do comando. Dentro destes três estados também se procura correspondência com os comandos de formatação itálico e bold de forma a poder ser aplicado também em listas (Figura~\ref{listas}).
+
+\begin{figure}[h!]
+  \centering
+      \includegraphics[width=0.6\textwidth]{listas.png}
+  \caption{Listas.\label{listas}}
+\end{figure}
+
+\section{Secções e Sub-secções}
+Existe um limite para os níveis de secções que podem ser criadas. Para resolver esse problema criamos uma função que, com auxílio de um apontador para um array de Strings, permite saber que nível pretendemos para imprimir o comando correcto e quando atinge o seu limite (Figura~\ref{seccao}.
+
+\begin{figure}[h!]
+  \centering
+   	\begin{subfigure}[b]{0.4\linewidth}
+    	\includegraphics[width=\linewidth]{seccao1.png}
+     	\caption{}
+   	\end{subfigure}
+  	
+  	\begin{subfigure}[b]{0.3\linewidth}
+    	\includegraphics[width=\linewidth]{seccao2.png}
+    	\caption{}
+  	\end{subfigure}
+  	
+  	\caption{BODY\_HEADER}
+  	\label{seccao}
+\end{figure}
+
 
 \paragraph{Início e Fim do documento}
 No ficheiro flex elaborado optamos por manipulação directa da stack de estados utilizando as funções \verb!yy_push_state! e \verb!yy_pop_state!. Para tal introduzimos "\verb!%option stack!" para além dos estados por nós definidos, como se pode verificar na Figura~\ref{estados}.
@@ -325,7 +482,7 @@ Nesta secção encontra-se os resultados do nosso analisador léxico no seguinte fo
 \item Cada subsecção é formado por duas imagens, onde a da esquerda é o input no do nosso analisador léxico em \LS e a da direita é o output em \LaTeX;
 \end{itemize}
 
-\subsection{Doctype, Titl e Autor}
+\subsection{Doctype, Title e Autor}
 
 \begin{figure}[h!]
   \centering
