@@ -5,21 +5,24 @@ BEGIN {
 
 /^\s*$/ { next; }
 
-{
+{ # Alinea (a)
     split($2, data, /-/);
     alA[data[1]]++;
 }
 
-NF > 5 {
-    # Alinea (b)
+NF > 5 { Alinea (b)
     for (i = 3; i < 6; i++) {
+        # Tirar Expostos/Solteiras/etc
+        gsub(/,.*$/, "", $i);
+
         split($i, nomes, /\s+/);
+
         for (nome in nomes)
             alB[nomes[nome]]++;
-        #alB[$i]++;
     }
 }
 
+# Alinea (c)
 /\<amantes?\>/   { alC["amante"]++; }
 /\<avo\>/        { alC["avo"]++; }
 /\<irmaos?\>/    { alC["irmao"]++; }
