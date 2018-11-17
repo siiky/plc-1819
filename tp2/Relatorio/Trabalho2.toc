@@ -1,0 +1,15 @@
+\babel@toc {portuges}{}
+\contentsline {chapter}{\numberline {1}Introdu\c c\~ao}{2}
+\contentsline {section}{\numberline {1.1}Enquadramento}{2}
+\contentsline {section}{\numberline {1.2}Estrutura do Relat\'orio}{2}
+\contentsline {chapter}{\numberline {2}An\'alise e Especifica\c c\~ao}{3}
+\contentsline {section}{\numberline {2.1}Descri\c c\~ao informal do problema}{3}
+\contentsline {section}{\numberline {2.2}Especifica\c c\~ao dos Requisitos}{3}
+\contentsline {chapter}{\numberline {3}Concep\c c\~ao/desenho da Resolu\c c\~ao}{4}
+\contentsline {section}{\numberline {3.1}Estruturas de Dados}{4}
+\contentsline {section}{\numberline {3.2}Algoritmos}{4}
+\contentsline {chapter}{\numberline {4}Codifica\c c\~ao e Testes}{5}
+\contentsline {section}{\numberline {4.1}Alternativas, Decis\~oes e Problemas de Implementa\c c\~ao}{5}
+\contentsline {section}{\numberline {4.2}Testes realizados e Resultados}{5}
+\contentsline {chapter}{\numberline {5}Conclus\~ao}{6}
+\contentsline {chapter}{\numberline {A}C\'odigo do Programa}{7}

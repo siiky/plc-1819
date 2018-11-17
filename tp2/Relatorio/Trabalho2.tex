@@ -1,0 +1,197 @@
+%
+% Layout retirado de http://www.di.uminho.pt/~prh/curplc09.html#notas
+%
+\documentclass{report}
+\usepackage[portuges]{babel}
+%\usepackage[utf8]{inputenc}
+\usepackage[latin1]{inputenc}
+\usepackage{url}
+\usepackage{enumerate}
+
+\usepackage{float} %package para introduzir a figura exactamente onde queremos no doc
+\usepackage{graphicx} %package para utilizar imagens em latex
+\graphicspath{ {images/} } %folder onde tem as imagens
+\usepackage{wrapfig}
+
+
+%\usepackage{alltt}
+%\usepackage{fancyvrb}
+\usepackage{listings}
+%LISTING - GENERAL
+\lstset{
+	language=C,
+	basicstyle=\small,
+	numbers=left,
+	numberstyle=\tiny,
+	numbersep=5pt,
+	breaklines=true,
+    frame=tB,
+	mathescape=true,
+	escapeinside={(*@}{@*)}
+}
+
+%
+%\lstset{ %
+%	language=Java,							% choose the language of the code
+%	basicstyle=\ttfamily\footnotesize,		% the size of the fonts that are used for the code
+%	keywordstyle=\bfseries,					% set the keyword style
+%	%numbers=left,							% where to put the line-numbers
+%	numberstyle=\scriptsize,				% the size of the fonts that are used for the line-numbers
+%	stepnumber=2,							% the step between two line-numbers. If it's 1 each line
+%											% will be numbered
+%	numbersep=5pt,							% how far the line-numbers are from the code
+%	backgroundcolor=\color{white},			% choose the background color. You must add \usepackage{color}
+%	showspaces=false,						% show spaces adding particular underscores
+%	showstringspaces=false,					% underline spaces within strings
+%	showtabs=false,							% show tabs within strings adding particular underscores
+%	frame=none,								% adds a frame around the code
+%	%abovecaptionskip=-.8em,
+%	%belowcaptionskip=.7em,
+%	tabsize=2,								% sets default tabsize to 2 spaces
+%	captionpos=b,							% sets the caption-position to bottom
+%	breaklines=true,						% sets automatic line breaking
+%	breakatwhitespace=false,				% sets if automatic breaks should only happen at whitespace
+%	title=\lstname,							% show the filename of files included with \lstinputlisting;
+%											% also try caption instead of title
+%	escapeinside={\%*}{*)},					% if you want to add a comment within your code
+%	morekeywords={*,...}					% if you want to add more keywords to the set
+%}
+
+\usepackage{xspace}
+
+\parindent=0pt
+\parskip=2pt
+
+\setlength{\oddsidemargin}{-1cm}
+\setlength{\textwidth}{18cm}
+\setlength{\headsep}{-1cm}
+\setlength{\textheight}{23cm}
+
+
+
+\def\LS{\textbf{\emph{LS}}}
+
+
+%%%%\input{LPgeneralDefintions}
+
+\title{Processamento de Linguagens e Compiladores\\\textbf{Processador de Róis de Confessados}\\ Relatório de Desenvolvimento}
+\author{André Sá (76361) \and João Bastos (47419) \and Pedro Sá (78164)}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+O trabalho apresentado consiste na criação de um processador de texto que a partir de Róis de Confessados disponibilizados calcula a frequência de alguns padrões.
+\end{abstract}
+
+\tableofcontents
+
+\chapter{Introdução} \label{intro}
+\section{Enquadramento}
+Os róis de confessados eram listas nominativas elaboradas durante a quaresma a fim de constatar quais fiéis se confessaram e comungaram no último ano. Este texto determinava que nos róis constassem os nomes de todos os paroquianos, estado matrimonial, se eram crismados, se eram menores de idade, entre outras informações consideradas relevantes. Os róis de confessados deveriam listar os fregueses de cada domicílio, separando as informações com uma linha. O processador texto que iremos criar será implementado sobre um exemplo de rol de confessados.
+
+\section{Estrutura do Relatório}
+Neste relatório começamos com a Introdução (Capítulo 1) onde, de uma forma breve tentamos descrever em \\
+
+
+Explicar como está organizado o documento, referindo os capítulos existentes em~\cite{Pereira201635}
+e a sua articulação explicando o conteúdo de cada um.
+No capítulo~\ref{ae} faz-se uma análise detalhada do problema proposto
+de modo a poder-se especificar  as entradas, resultados e formas de transformação.\\
+etc. \ldots\\
+No capítulo~\ref{concl} termina-se o relatório com uma síntese do que foi dito,
+as conclusões e o trabalho futuro
+
+
+\chapter{Análise e Especificação}
+\section{Descrição informal do problema}
+
+Foi-nos proposto construir um ficheiro Gawk, para processar um rol de confessados, com o intuito de calcular o número de certas ocorrências.
+
+\section{Especificação dos Requisitos}
+
+O Rol de Confessados que nos foi facultado tem um registo por linha.
+Cada campo do registo está separado por "::", sendo que 6 têm o seguinte conteúdo:
+\begin{description}
+\item[1º campo (\$1)] Número do registo;
+\item[2º campo (\$2)] Data do registo;
+\item[3º campo (\$3)] Nome do paroquiano a registar;
+\item[4º campo (\$4)] Pai do paroquiano;
+\item[5º campo (\$5)] Mãe do paroquiano;
+\item[6º campo (\$6)] Informação complementar.
+\end{description} 
+e o último campo apresenta-se sempre vazio.\\
+
+Todos os registos têm os primeiros 3 campos preenchidos, podendo os restantes estar omissos.
+Apresentemos o exemplo de um registo completo para facilitar na compreensão do exposto acima e nas seguintes referências a registos do Rol de Confessados.
+
+\begin{verbatim}
+
+\end{verbatim}
+
+Foi-nos então proposto sobre este texto fazermos o seguinte processamento:
+\begin{enumerate}
+\item Calcular a frequência de processos por ano.
+	Dentro do 2ª campo
+\item Calcular a frequência de nomes.
+\item Calcular a frequência dos vários tipo de relação. 
+\end{enumerate}
+
+
+
+\chapter{Concepção/desenho da Resolução}
+
+
+
+
+
+\section{Estruturas de Dados}
+
+Um array associativo é uma estrutura de dados - análoga aos dicionários - composta por um conjunto não ordenado de itens formados por um par chave e valor, em que cada chave possui um valor associado. \\
+O Gawk permite-nos utilizar strings como índices. Assim, optamos pela utilização de arrays associativos para contar a ocorrência de determinadas strings sendo as strings as chaves e o valor correspondente ao número de ocorrências de cada uma.
+
+\section{Algoritmos}
+Visto não haver vontade ou qualquer necessidade de escrever merda nenhuma aqui, optamos simplesmente por nada escrever. 20 valores!!
+
+\chapter{Codificação e Testes}
+\section{Alternativas, Decisões e Problemas de Implementação}
+\section{Testes realizados e Resultados}
+Mostram-se a seguir alguns testes feitos (valores introduzidos) e
+os respectivos resultados obtidos:
+
+%\VerbatimInput{teste1.txt}
+
+
+\chapter{Conclusão} \label{concl}
+Síntese do Documento~\cite{Martini2016a,Hoare73a}.\\
+Estado final do projecto; Análise crítica dos resultados~\cite{Sto77a}.\\
+Trabalho futuro.
+
+\appendix
+\chapter{Código do Programa}
+
+%\lstinputlisting{lpp.l} %input de um ficheiro
+%\VerbatimInput{lpp.l}
+\bibliographystyle{alpha}
+%\bibliographystyle{plain}
+%\bibliographystyle{named}
+
+\bibliography{Trabalho1}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document} 
