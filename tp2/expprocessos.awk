@@ -40,26 +40,29 @@ $6 ~ /,\<sobrinhos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["sobrinho"]++; }
 $6 ~ /,\<tias?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tia"]++; }
 $6 ~ /,\<tios?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tio"]++; }
 
-function alineaB ()
+function alineaA (outf)
 {
-    for (nome in alB)
-        printf("%s\t%s\n", nome, alB[nome]);
-}
-
-function alineaA ()
-{
+    printf "" > outf;
     for (ano in alA)
-        printf("%s\t%s\n", ano, alA[ano]);
+        printf("%s\t%s\n", ano, alA[ano]) >> outf;
 }
 
-function alineaC ()
+function alineaB (outf)
 {
+    printf "" > outf;
+    for (nome in alB)
+        printf("%s\t%s\n", nome, alB[nome]) >> outf;
+}
+
+function alineaC (outf)
+{
+    printf "" > outf;
     for (parentesco in alC)
-        printf("%s\t%s\n", parentesco, alC[parentesco]);
+        printf("%s\t%s\n", parentesco, alC[parentesco]) >> outf;
 }
 
 END {
-    alineaA();
-    alineaB();
-    alineaC();
+    alineaA("anos.txt");
+    alineaB("nomes.txt");
+    alineaC("parentescos.txt");
 }
