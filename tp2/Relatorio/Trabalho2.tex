@@ -19,7 +19,7 @@
 \usepackage{listings}
 %LISTING - GENERAL
 \lstset{
-	language=AWK,
+	language=C,
 	basicstyle=\small,
 	numbers=left,
 	numberstyle=\tiny,
@@ -93,25 +93,21 @@ O trabalho apresentado consiste na criação de um processador de texto que a part
 Os róis de confessados eram listas nominativas elaboradas durante a quaresma a fim de constatar quais fiéis se confessaram e comungaram no último ano. Este texto determinava que nos róis constassem os nomes de todos os paroquianos, estado matrimonial, se eram crismados, se eram menores de idade, entre outras informações consideradas relevantes. Os róis de confessados deveriam listar os fregueses de cada domicílio, separando as informações com uma linha. O processador texto que iremos criar será implementado sobre um exemplo de rol de confessados.
 
 \section{Estrutura do Relatório}
-Neste relatório começamos com a Introdução (Capítulo 1) onde, de uma forma breve tentamos descrever em \\
-
-
-Explicar como está organizado o documento, referindo os capítulos existentes em~\cite{Pereira201635}
-e a sua articulação explicando o conteúdo de cada um.
-No capítulo~\ref{ae} faz-se uma análise detalhada do problema proposto
-de modo a poder-se especificar  as entradas, resultados e formas de transformação.\\
-etc. \ldots\\
-No capítulo~\ref{concl} termina-se o relatório com uma síntese do que foi dito,
-as conclusões e o trabalho futuro
+Neste relatório começamos com a Introdução (Capítulo 1) onde, de uma forma breve tentamos descrever o enquadramento do documento e a estrutura do mesmo. \\
+No capítulo 2 analisamos o texto a processar e o problema que nos foi proposto de forma mais detalhada bem como uma introdução da nossa abordagem ao mesmo.\\
+No capítulo 3 indicamos a estrutura de dados utilizada e explicamos o código por nós criado.
+O capítulo 4 apresentamos alguns testes realizados e o respectivo output.
+O capítulo 5 é composto pela conclusão, onde fazemos uma análise ao projecto executado.
+Por último o documento tem o apêndice onde foi introduzido o código fonte do ficheiro Gawk.
 
 
 \chapter{Análise e Especificação}
 \section{Descrição informal do problema}
 
-Foi-nos proposto construir um ficheiro Gawk, para processar um rol de confessados, com o intuito de calcular o número de certas ocorrências.
+Este projecto tem como objectivo o aprofundamento de conhecimento do Sistema de Produção\footnote{Sistema baseado num conjunto de regras 'Condição-Acção} AWK (uma lingagem de programação para a deteção de padrões e processamento de texto, mais o respetivo interpretador). Para tal, foi-nos proposto construir um ficheiro Gawk\footnote{Gawk - GNU AWK (A palavra AWK é uma abreviatura das iniciais dos sobrenomes dos criadores da linguagem (Aho, Weinberger e Kernighan).} para processar um rol de confessados, com o intuito de calcular o número de certas ocorrências.\\
+Na próxima secção indicaremos com mais detalhe as ocorrências pretendidas e de que forma pretendemos resolver tais problemas.
 
 \section{Especificação dos Requisitos}
-\label{esp}
 
 O Rol de Confessados que nos foi facultado tem um registo por linha.
 Cada campo do registo está separado por "::", sendo que 6 têm o seguinte conteúdo:
@@ -129,40 +125,149 @@ Todos os registos têm os primeiros 3 campos preenchidos, podendo os restantes es
 Apresentemos o exemplo de um registo completo para facilitar na compreensão do exposto acima e nas seguintes referências a registos do Rol de Confessados.
 
 \begin{verbatim}
-
+598::1722-07-29::Pedro Jose Sousa::Pedro Sousa Falcao::Mariana Sousa Pereira
+::Manuel Felix Sousa,Irmao. Proc.8224.::
 \end{verbatim}
 
-Foi-nos então proposto sobre este texto fazermos o seguinte processamento:
-\begin{enumerate}
-\item Calcular a frequência de processos por ano.
-	Dentro do 2ª campo
-\item Calcular a frequência de nomes.
-\item Calcular a frequência dos vários tipo de relação. 
-\end{enumerate}
+
+Foi-nos proposto sobre o Rol de Confessados fazermos o seguinte processamento:
+
+\subsubsection{Alínea a) - Calcular a frequência de processos por ano}
+Dentro do 2ª campo, que representa a data do registo, teremos de verificar em cada registo o ano indicado e calcular o número de vezes que cada ano aparece.
+
+\subsubsection{Alínea b) - Calcular a frequência de nomes}
+Dentro dos campos 3, 4 e 5 teremos de verificar todos os nomes apresentados e contabilizá-los para após todas as linhas serem processadas apresentarmos o número de ocorrências de cada nome em todas as linhas do rol.
+
+\subsubsection{Alínea c) - Calcular a frequência dos vários tipo de relação} 
+Em alguns registos existe informação sobre os tipos de relação existentes com o paroquiano em questão. Essa informação está presente somente no 6º campo pelo que teremos de verificar as ocorrências dessas relações e contabilizar todas para no final apresentarmos o número de ocorrências de cada relação.
+
 
 
 
 \chapter{Concepção/desenho da Resolução}
+
+
+
+
 
 \section{Estruturas de Dados}
 
 Um array associativo é uma estrutura de dados - análoga aos dicionários - composta por um conjunto não ordenado de itens formados por um par chave e valor, em que cada chave possui um valor associado. \\
 O Gawk permite-nos utilizar strings como índices. Assim, optamos pela utilização de arrays associativos para contar a ocorrência de determinadas strings sendo as strings as chaves e o valor correspondente ao número de ocorrências de cada uma.
 
-\section{Algoritmos}
-Visto não haver vontade ou qualquer necessidade de escrever merda nenhuma aqui, optamos simplesmente por nada escrever. 20 valores!!
+\section{Codificação}
+
+\subsubsection{BEGIN}
+Inicialmente especificamos acções a serem executadas antes do processamento da primeira linha utilizando o padrão BEGIN.
+\begin{verbatim}
+BEGIN   {
+            FS="::";
+            IGNORECASE=1
+        }
+\end{verbatim}
+Assim definimos o Field Separator (FS) como "::" \ e a detecção de padrões como Case Insensitive.
+
+\subsubsection{Linhas em Branco}
+Salvaguardamos o facto do ficheiro ter linhas em branco ignorando as mesmas.
+\begin{verbatim}
+/^\s*$/	{ next; } 
+\end{verbatim}
+
+\subsubsection{Alínea a) - Frequência de processos por ano}
+Para calcularmos o número de processos por ano separamos o que está entre '-' no 1º campo e, num array associativo, utilizamos o elemento correspondente ao ano\footnote{Formato do 1º campo: 1778-01-14. Ter em conta que em Awk os índices dos arrays sendo numéricos começam em 1, que é o índice onde será guardado o ano no array data.} como chave. Se a chave já existe apenas incrementa, caso contrário cria a nova chave e incrementa o valor.
+\begin{verbatim}
+		{
+    			split($2, data, /-/);
+    			alA[data[1]]++;
+		}
+\end{verbatim}
+
+\subsubsection{Alínea b) - Frequência de nomes}
+Os nomes que pretendemos vão estar todos entre os campos 3, 4 e 5, que correspondem respectivamente ao paroquiano, o seu pai e a sua mãe. Nos campos indicados estão os nomes completos mas, uma vez que pretendemos contar as ocorrências de cada nome, separamos os vários nomes e apelidos e guardamos num array associativo. Cada nome/apelido será a chave desse array e a cada ocorrência irá incrementar o respectivo valor. Assim, no final do processamento de todas as linhas do texto teremos guardado nesse array todos os nomes/apelidos (chave) e o número de ocorrências de cada um deles (valor).
+
+\begin{verbatim}
+{
+    for (i = 3; i < 6; i++) {
+        # Tirar Expostos/Solteiras/etc
+        gsub(/,.*$/, "", $i);
+
+        split($i, nomes, /\s+/);
+
+        for (nome in nomes)
+            alB[nomes[nome]]++;
+    }
+}
+\end{verbatim}
+
+
+\subsubsection{Alínea c) - Frequência dos tipos de relação}
+Analisando o rol de confessados que nos foi facultado verificamos que dentro do 6º campo temos informação complementar onde ,entre outras informações, surgem os tipos de relação ou grau de parentesco. Portanto procuramos correspondências com os padrões dentro do 6º campo de cada linha.
+Verificamos também que cada relação identificada é precedida de uma virgula e termina com o ponto final. Assim, optamos pela procura desse padrão associando a correspondência à chave do array associativo incrementando o seu valor a cada correspondência obtida.
+
+
+\begin{verbatim}
+
+$6 ~ /,\<avo\>([ ]+[mp]atern[oa]s?)?\./        { alC["avo"]++; }
+$6 ~ /,\<irmaos?\>([ ]+[mp]atern[oa]s?)?\./    { alC["irmao"]++; }
+$6 ~ /,\<irmas?\>([ ]+[mp]atern[oa]s?)?\./     { alC["irma"]++; }
+$6 ~ /,\<mae\>\./                              { alC["mae"]++; }
+$6 ~ /,\<madrastas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["madrasta"]++; }
+$6 ~ /,\<padrastos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["padrasto"]++; }
+$6 ~ /,\<madrinhas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["madrinha"]++; }
+$6 ~ /,\<padrinhos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["padrinho"]++; }
+$6 ~ /,\<pai\>\./                              { alC["pai"]++; }
+$6 ~ /,\<primas?\>([ ]+[mp]atern[oa]s?)?\./    { alC["prima"]++; }
+$6 ~ /,\<primos?\>([ ]+[mp]atern[oa]s?)?\./    { alC["primo"]++; }
+$6 ~ /,\<sobrinhas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["sobrinha"]++; }
+$6 ~ /,\<sobrinhos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["sobrinho"]++; }
+$6 ~ /,\<tias?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tia"]++; }
+$6 ~ /,\<tios?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tio"]++; }
+\end{verbatim}
+
+\subsubsection{Funções}
+Definimos 3 funções que irão escrever o conteúdo de cada um dos arrays associativos - cada um no seu ficheiro - de forma formatada e com uma descrição na primeira linha de cada um.
+\begin{verbatim}
+function alineaA (outf)
+{
+    printf "Frequência de processos por ano:\n" > outf;
+    for (ano in alA)
+        printf("%s\t%s\n", ano, alA[ano]) >> outf;
+}
+
+function alineaB (outf)
+{
+    printf "Frequência de nomes:\n" > outf;
+    for (nome in alB)
+        printf("%s\t%s\n", nome, alB[nome]) >> outf;
+}
+
+function alineaC (outf)
+{
+    printf "Frequência dos vários tipos de relação:\n" > outf;
+    for (parentesco in alC)
+        printf("%s\t%s\n", parentesco, alC[parentesco]) >> outf;
+}
+\end{verbatim}
+ 
+ 
+\subsubsection{END}
+
+Para finalizar utilizamos o END para executarmos as funções acima definidas após todas as linhas terem sido executadas. 
+
+\begin{verbatim}
+END     {
+          alineaA("anos.txt");
+          alineaB("nomes.txt");
+          alineaC("parentescos.txt");
+        }	
+\end{verbatim}
+Criando assim os 3 ficheiros com extensão txt que irão armazenar os resultados pedidos para cada uma das alíneas.
 
 \chapter{Codificação e Testes}
 \section{Alternativas, Decisões e Problemas de Implementação}
 \section{Testes realizados e Resultados}
-Devido ao facto do rol de confessados ter bastante informação para ser processada($\approx 37000 linhas$), o grupo decidiu para efeitos de apresentação de testes e resultados desse processamento, apresentar neste relatório uma porção do rol de confessados representativa de todo o tipo de variações de apresentação de tal informação.\\
-Ao processar o rol de confessados verificamos que existe algumas variações de apresentação da informação, isto é, existe registos(linhas do rol de confessados) que os campos não estavam todos preenchidos, mais especificamente o campo 6, e por vezes nesse campo que como foi referido na secção ~\ref{esp},esse campo contém informação que varia entre parentesco e/ou uma descrição relevante para aquele registo. 
-
-\begin{figure}[h!]
-  \centering
-    \includegraphics[width=0.5\textwidth]{anos.png}
-  \caption{Estados\label{estados}}
-\end{figure}
+Mostram-se a seguir alguns testes feitos (valores introduzidos) e
+os respectivos resultados obtidos:
 
 %\VerbatimInput{teste1.txt}
 

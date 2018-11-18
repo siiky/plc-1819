@@ -5,11 +5,21 @@
 \contentsline {chapter}{\numberline {2}An\'alise e Especifica\c c\~ao}{3}
 \contentsline {section}{\numberline {2.1}Descri\c c\~ao informal do problema}{3}
 \contentsline {section}{\numberline {2.2}Especifica\c c\~ao dos Requisitos}{3}
-\contentsline {chapter}{\numberline {3}Concep\c c\~ao/desenho da Resolu\c c\~ao}{4}
-\contentsline {section}{\numberline {3.1}Estruturas de Dados}{4}
-\contentsline {section}{\numberline {3.2}Algoritmos}{4}
-\contentsline {chapter}{\numberline {4}Codifica\c c\~ao e Testes}{5}
-\contentsline {section}{\numberline {4.1}Alternativas, Decis\~oes e Problemas de Implementa\c c\~ao}{5}
-\contentsline {section}{\numberline {4.2}Testes realizados e Resultados}{5}
-\contentsline {chapter}{\numberline {5}Conclus\~ao}{6}
-\contentsline {chapter}{\numberline {A}C\'odigo do Programa}{7}
+\contentsline {subsubsection}{Al\IeC {\'\i }nea a) - Calcular a frequ\^encia de processos por ano}{4}
+\contentsline {subsubsection}{Al\IeC {\'\i }nea b) - Calcular a frequ\^encia de nomes}{4}
+\contentsline {subsubsection}{Al\IeC {\'\i }nea c) - Calcular a frequ\^encia dos v\'arios tipo de rela\c c\~ao}{4}
+\contentsline {chapter}{\numberline {3}Concep\c c\~ao/desenho da Resolu\c c\~ao}{5}
+\contentsline {section}{\numberline {3.1}Estruturas de Dados}{5}
+\contentsline {section}{\numberline {3.2}Codifica\c c\~ao}{5}
+\contentsline {subsubsection}{BEGIN}{5}
+\contentsline {subsubsection}{Linhas em Branco}{5}
+\contentsline {subsubsection}{Al\IeC {\'\i }nea a) - Frequ\^encia de processos por ano}{5}
+\contentsline {subsubsection}{Al\IeC {\'\i }nea b) - Frequ\^encia de nomes}{6}
+\contentsline {subsubsection}{Al\IeC {\'\i }nea c) - Frequ\^encia dos tipos de rela\c c\~ao}{6}
+\contentsline {subsubsection}{Fun\c c\~oes}{6}
+\contentsline {subsubsection}{END}{7}
+\contentsline {chapter}{\numberline {4}Codifica\c c\~ao e Testes}{8}
+\contentsline {section}{\numberline {4.1}Alternativas, Decis\~oes e Problemas de Implementa\c c\~ao}{8}
+\contentsline {section}{\numberline {4.2}Testes realizados e Resultados}{8}
+\contentsline {chapter}{\numberline {5}Conclus\~ao}{9}
+\contentsline {chapter}{\numberline {A}C\'odigo do Programa}{10}
