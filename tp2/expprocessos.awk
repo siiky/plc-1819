@@ -24,20 +24,21 @@ BEGIN {
 
 # Alinea (c)
 $6 ~ /,\<avo\>([ ]+[mp]atern[oa]s?)?\./        { alC["avo"]++; }
-$6 ~ /,\<irmaos?\>([ ]+[mp]atern[oa]s?)?\./    { alC["irmao"]++; }
-$6 ~ /,\<irmas?\>([ ]+[mp]atern[oa]s?)?\./     { alC["irma"]++; }
-$6 ~ /,\<mae\>\./			       { alC["mae"]++; }
-$6 ~ /,\<madrastas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["madrasta"]++; }
-$6 ~ /,\<padrastos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["padrasto"]++; }
-$6 ~ /,\<madrinhas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["madrinha"]++; }
-$6 ~ /,\<padrinhos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["padrinho"]++; }
-$6 ~ /,\<pai\>\./			       { alC["pai"]++; }
+$6 ~ /,\<irmaos?\>\./                          { alC["irmao"]++; }
+$6 ~ /,\<irmas?\>\./                           { alC["irma"]++; }
+$6 ~ /,\<mae\>\./                              { alC["mae"]++; }
+$6 ~ /,\<madrastas?\>\./                       { alC["madrasta"]++; }
+$6 ~ /,\<padrastos?\>\./                       { alC["padrasto"]++; }
+$6 ~ /,\<madrinhas?\>\./                       { alC["madrinha"]++; }
+$6 ~ /,\<padrinhos?\>\./                       { alC["padrinho"]++; }
+$6 ~ /,\<pai\>\./                              { alC["pai"]++; }
 $6 ~ /,\<primas?\>([ ]+[mp]atern[oa]s?)?\./    { alC["prima"]++; }
 $6 ~ /,\<primos?\>([ ]+[mp]atern[oa]s?)?\./    { alC["primo"]++; }
 $6 ~ /,\<sobrinhas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["sobrinha"]++; }
 $6 ~ /,\<sobrinhos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["sobrinho"]++; }
 $6 ~ /,\<tias?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tia"]++; }
 $6 ~ /,\<tios?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tio"]++; }
+
 
 function alineaA (outf)
 {
