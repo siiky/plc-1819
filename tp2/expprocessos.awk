@@ -10,7 +10,7 @@ BEGIN {
     alA[data[1]]++;
 }
 
-NF > 5 { Alinea (b)
+{ # Alinea (b)
     for (i = 3; i < 6; i++) {
         # Tirar Expostos/Solteiras/etc
         gsub(/,.*$/, "", $i);
@@ -23,22 +23,22 @@ NF > 5 { Alinea (b)
 }
 
 # Alinea (c)
-/\<amantes?\>/   { alC["amante"]++; }
-/\<avo\>/        { alC["avo"]++; }
-/\<irmaos?\>/    { alC["irmao"]++; }
-/\<irmas?\>/     { alC["irma"]++; }
-/\<maes?\>/      { alC["mae"]++; }
-/\<madrastas?\>/ { alC["madrasta"]++; }
-/\<padrastos?\>/ { alC["padrasto"]++; }
-/\<madrinhas?\>/ { alC["madrinha"]++; }
-/\<padrinhos?\>/ { alC["padrinho"]++; }
-/\<pais?\>/      { alC["pai"]++; }
-/\<primas?\>/    { alC["prima"]++; }
-/\<primos?\>/    { alC["primo"]++; }
-/\<sobrinhas?\>/ { alC["sobrinha"]++; }
-/\<sobrinhos?\>/ { alC["sobrinho"]++; }
-/\<tias?\>/      { alC["tia"]++; }
-/\<tios?\>/      { alC["tio"]++; }
+$6 ~ /,\<amantes?\>([ ]+[mp]atern[oa]s?)?\./   { alC["amante"]++; }
+$6 ~ /,\<avo\>([ ]+[mp]atern[oa]s?)?\./        { alC["avo"]++; }
+$6 ~ /,\<irmaos?\>([ ]+[mp]atern[oa]s?)?\./    { alC["irmao"]++; }
+$6 ~ /,\<irmas?\>([ ]+[mp]atern[oa]s?)?\./     { alC["irma"]++; }
+$6 ~ /,\<maes?\>([ ]+[mp]atern[oa]s?)?\./      { alC["mae"]++; }
+$6 ~ /,\<madrastas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["madrasta"]++; }
+$6 ~ /,\<padrastos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["padrasto"]++; }
+$6 ~ /,\<madrinhas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["madrinha"]++; }
+$6 ~ /,\<padrinhos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["padrinho"]++; }
+$6 ~ /,\<pais?\>([ ]+[mp]atern[oa]s?)?\./      { alC["pai"]++; }
+$6 ~ /,\<primas?\>([ ]+[mp]atern[oa]s?)?\./    { alC["prima"]++; }
+$6 ~ /,\<primos?\>([ ]+[mp]atern[oa]s?)?\./    { alC["primo"]++; }
+$6 ~ /,\<sobrinhas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["sobrinha"]++; }
+$6 ~ /,\<sobrinhos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["sobrinho"]++; }
+$6 ~ /,\<tias?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tia"]++; }
+$6 ~ /,\<tios?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tio"]++; }
 
 function alineaB ()
 {
