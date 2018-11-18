@@ -157,7 +157,7 @@ Visto não haver vontade ou qualquer necessidade de escrever merda nenhuma aqui, 
 \section{Testes realizados e Resultados}
 Devido ao facto do rol de confessados ter bastante informação para ser processada($\approx 37000 linhas$), o grupo decidiu para efeitos de apresentação de testes e resultados desse processamento, apresentar neste relatório uma porção do rol de confessados representativa de todo o tipo de variações de apresentação de tal informação.\\
 Ao processar o rol de confessados verificamos que existe algumas variações de apresentação da informação, isto é, existe registos(linhas do rol de confessados) que os campos não estavam todos preenchidos, mais especificamente o campo 6, e por vezes como foi referido na secção \ref{esp},esse campo contém informação que varia entre parentesco e/ou uma descrição relevante para aquele registo.\\
-Abaixo encontra-se a tal porção do rol de processos, onde cada linha representa um registo desse rol e contém os campos referidos na secção \ref{esp}. 
+Abaixo encontra-se a tal porção do rol de processos, onde cada linha representa um registo desse rol e contém os campos referidos na secção \ref{esp}.
 \\
 
 
@@ -181,6 +181,11 @@ De seguida temos o ficheiro com o resultado da frequência de vároios tipos de re
 Síntese do Documento~\cite{Martini2016a,Hoare73a}.\\
 Estado final do projecto; Análise crítica dos resultados~\cite{Sto77a}.\\
 Trabalho futuro.
+
+
+Este projecto mostrou-nos que o Gawk permite-nos programar filtros de texto e relatórios sobre informação de forma muito acessível. 
+O projeto para o que nos foi pedido encontra-se finalizado, 
+E se no futuro houver necessidade de haver uma maior filtragem simplesmente é seguir a estrutura dos filtros presentes e adaptá-los, o que é fácil tendo em conta que o código é bastante simples em termos de funcionamento e bastante legível. 
 
 \appendix
 \chapter{Código do Programa}

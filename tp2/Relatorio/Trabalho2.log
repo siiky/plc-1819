@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.10.14)  18 NOV 2018 18:00
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.10.14)  18 NOV 2018 19:04
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -296,15 +296,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 173--174
 
 (../parentescos.txt) [7]
 Cap\'{\i }tulo 5.
-
-LaTeX Warning: Citation `Martini2016a' on page 8 undefined on input line 181.
-
-
-LaTeX Warning: Citation `Hoare73a' on page 8 undefined on input line 181.
-
-
-LaTeX Warning: Citation `Sto77a' on page 8 undefined on input line 182.
-
 [8
 
 ]
@@ -323,10 +314,10 @@ LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 4131 strings out of 492982
- 55936 string characters out of 6134895
+ 4128 strings out of 492982
+ 55904 string characters out of 6134895
  243420 words of memory out of 5000000
- 7624 multiletter control sequences out of 15000+600000
+ 7621 multiletter control sequences out of 15000+600000
  10497 words of font info for 37 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  41i,7n,49p,578b,1600s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -341,7 +332,7 @@ ublic/amsfonts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
 sfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/c
 m/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10
 .pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb>
-Output written on Trabalho2.pdf (12 pages, 153673 bytes).
+Output written on Trabalho2.pdf (12 pages, 153735 bytes).
 PDF statistics:
  91 PDF objects out of 1000 (max. 8388607)
  64 compressed objects within 1 object stream
