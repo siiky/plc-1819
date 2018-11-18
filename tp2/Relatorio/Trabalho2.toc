@@ -8,8 +8,7 @@
 \contentsline {chapter}{\numberline {3}Concep\c c\~ao/desenho da Resolu\c c\~ao}{4}
 \contentsline {section}{\numberline {3.1}Estruturas de Dados}{4}
 \contentsline {section}{\numberline {3.2}Algoritmos}{4}
-\contentsline {chapter}{\numberline {4}Codifica\c c\~ao e Testes}{5}
-\contentsline {section}{\numberline {4.1}Alternativas, Decis\~oes e Problemas de Implementa\c c\~ao}{5}
-\contentsline {section}{\numberline {4.2}Testes realizados e Resultados}{5}
+\contentsline {chapter}{\numberline {4}Testes}{5}
+\contentsline {section}{\numberline {4.1}Testes realizados e Resultados}{5}
 \contentsline {chapter}{\numberline {5}Conclus\~ao}{8}
 \contentsline {chapter}{\numberline {A}C\'odigo do Programa}{9}

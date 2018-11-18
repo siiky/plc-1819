@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.10.14)  18 NOV 2018 19:04
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.10.14)  18 NOV 2018 19:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -270,7 +270,7 @@ Cap\'{\i }tulo 3.
 ]
 Cap\'{\i }tulo 4.
 
-Underfull \hbox (badness 10000) in paragraph at lines 158--162
+Underfull \hbox (badness 10000) in paragraph at lines 157--161
 
  []
 
@@ -278,19 +278,19 @@ Underfull \hbox (badness 10000) in paragraph at lines 158--162
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <9> on input line 1.
 )
-Underfull \hbox (badness 10000) in paragraph at lines 166--167
+Underfull \hbox (badness 10000) in paragraph at lines 165--166
 
  []
 
-[5
+(../anos.txt [5
 
-] (../anos.txt)
-Underfull \hbox (badness 10000) in paragraph at lines 170--171
+])
+Underfull \hbox (badness 10000) in paragraph at lines 169--170
 
  []
 
 (../nomes.txt [6])
-Underfull \hbox (badness 10000) in paragraph at lines 173--174
+Underfull \hbox (badness 10000) in paragraph at lines 172--173
 
  []
 
@@ -300,23 +300,17 @@ Cap\'{\i }tulo 5.
 
 ]
 Ap\^endice A.
-(./Trabalho2.bbl [9
+[9
 
-]
-
-LaTeX Warning: Empty `thebibliography' environment on input line 3.
-
-) [10
-
-] (./Trabalho2.aux)
+] [10] (./Trabalho2.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 4128 strings out of 492982
- 55904 string characters out of 6134895
- 243420 words of memory out of 5000000
+ 4125 strings out of 492982
+ 55872 string characters out of 6134895
+ 244420 words of memory out of 5000000
  7621 multiletter control sequences out of 15000+600000
  10497 words of font info for 37 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -331,11 +325,12 @@ type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
 ublic/amsfonts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
 sfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/c
 m/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10
-.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb>
-Output written on Trabalho2.pdf (12 pages, 153735 bytes).
+.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></
+usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on Trabalho2.pdf (12 pages, 172716 bytes).
 PDF statistics:
- 91 PDF objects out of 1000 (max. 8388607)
- 64 compressed objects within 1 object stream
+ 95 PDF objects out of 1000 (max. 8388607)
+ 67 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
