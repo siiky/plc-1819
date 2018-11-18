@@ -11,5 +11,5 @@
 \contentsline {chapter}{\numberline {4}Codifica\c c\~ao e Testes}{5}
 \contentsline {section}{\numberline {4.1}Alternativas, Decis\~oes e Problemas de Implementa\c c\~ao}{5}
 \contentsline {section}{\numberline {4.2}Testes realizados e Resultados}{5}
-\contentsline {chapter}{\numberline {5}Conclus\~ao}{6}
-\contentsline {chapter}{\numberline {A}C\'odigo do Programa}{7}
+\contentsline {chapter}{\numberline {5}Conclus\~ao}{8}
+\contentsline {chapter}{\numberline {A}C\'odigo do Programa}{9}

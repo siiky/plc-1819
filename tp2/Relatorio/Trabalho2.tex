@@ -156,15 +156,25 @@ Visto não haver vontade ou qualquer necessidade de escrever merda nenhuma aqui, 
 \section{Alternativas, Decisões e Problemas de Implementação}
 \section{Testes realizados e Resultados}
 Devido ao facto do rol de confessados ter bastante informação para ser processada($\approx 37000 linhas$), o grupo decidiu para efeitos de apresentação de testes e resultados desse processamento, apresentar neste relatório uma porção do rol de confessados representativa de todo o tipo de variações de apresentação de tal informação.\\
-Ao processar o rol de confessados verificamos que existe algumas variações de apresentação da informação, isto é, existe registos(linhas do rol de confessados) que os campos não estavam todos preenchidos, mais especificamente o campo 6, e por vezes nesse campo que como foi referido na secção ~\ref{esp},esse campo contém informação que varia entre parentesco e/ou uma descrição relevante para aquele registo. 
+Ao processar o rol de confessados verificamos que existe algumas variações de apresentação da informação, isto é, existe registos(linhas do rol de confessados) que os campos não estavam todos preenchidos, mais especificamente o campo 6, e por vezes como foi referido na secção \ref{esp},esse campo contém informação que varia entre parentesco e/ou uma descrição relevante para aquele registo.\\
+Abaixo encontra-se a tal porção do rol de processos, onde cada linha representa um registo desse rol e contém os campos referidos na secção \ref{esp}. 
+\\
 
-\begin{figure}[h!]
-  \centering
-    \includegraphics[width=0.5\textwidth]{anos.png}
-  \caption{Estados\label{estados}}
-\end{figure}
 
-%\VerbatimInput{teste1.txt}
+\lstinputlisting{../teste1.txt} %input de um ficheiro
+
+De seguida temos o ficheiro com o resultado da frequência de processos por ano:\\
+
+\lstinputlisting{../anos.txt} %input de um ficheiro
+
+De seguida temos o ficheiro com o resultado da frequência de nomes:\\
+\lstinputlisting{../nomes.txt} %input de um ficheiro
+
+De seguida temos o ficheiro com o resultado da frequência de vároios tipos de relação:\\
+\lstinputlisting{../parentescos.txt} %input de um ficheiro
+
+%\VerbatimInput{../teste1.txt}
+
 
 
 \chapter{Conclusão} \label{concl}

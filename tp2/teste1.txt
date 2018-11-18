@@ -9,3 +9,6 @@
 587::1681-02-12::Pedro Lima Antunes::Francisco Sampaio Antunes::Justa Goncalves
 1246::1695-05-07::Bento Silva Teles::Henrique Sousa Teles::Maria Silva::Fez Inquiricao para Conego da Se de Braga, em 1708/07/24.   Ver TomoV, fls.430.  Antonio Silva Teles, Joao Silva Teles, Manuel Sousa Teles  e  Matias Ribeiro,Irmaos. Proc.7984.  Francisco Silva Teles,Sobrinho Paterno. Proc.28871.::
 85::1689-08-27::Jose Soares Pereira::Joao Soares Pereira::Margarida Silva Vasconcelos::Gaspar Silva Pereira, Luis Soares Bacelar  e  Pedro Beca Pereira,Irmaos. Proc.27470.::
+578::1901-10-24::Antonio Pereira Lomba::Manuel Pereira Lomba::Rosa Maria Alves::Antonio Pereira Lomba,Tio Paterno. Proc.13040.::
+561::1845-04-29::Antonio Pereira Silva Junior::Antonio Pereira Silva::Maria Jose Alvares::Jose Joaquim Silva Pereira,Irmao. Proc.26187.   Manuel Lopes Oliveira,Tio Materno. Proc.10442.::
+
