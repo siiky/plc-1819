@@ -41,21 +41,21 @@ $6 ~ /,\<tios?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tio"]++; }
 
 function alineaA (outf)
 {
-    printf "Frequência de processos por ano:\n" > outf;
+    printf "Frequencia de processos por ano:\n" > outf;
     for (ano in alA)
         printf("%s\t%s\n", ano, alA[ano]) >> outf;
 }
 
 function alineaB (outf)
 {
-    printf "Frequência de nomes:\n" > outf;
+    printf "Frequencia de nomes:\n" > outf;
     for (nome in alB)
         printf("%s\t%s\n", nome, alB[nome]) >> outf;
 }
 
 function alineaC (outf)
 {
-    printf "Frequência dos vários tipos de relação:\n" > outf;
+    printf "Frequencia dos varios tipos de relacao:\n" > outf;
     for (parentesco in alC)
         printf("%s\t%s\n", parentesco, alC[parentesco]) >> outf;
 }

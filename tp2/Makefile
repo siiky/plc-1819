@@ -3,3 +3,6 @@ install:
 
 teste1:
 	gawk -f expprocessos.awk teste1.txt
+
+clean:
+	rm anos.txt nomes.txt parentescos.txt

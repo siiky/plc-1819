@@ -152,50 +152,109 @@ O Gawk permite-nos utilizar strings como índices. Assim, optamos pela utilização
 \section{Algoritmos}
 Visto não haver vontade ou qualquer necessidade de escrever merda nenhuma aqui, optamos simplesmente por nada escrever. 20 valores!!
 
-\chapter{Codificação e Testes}
+\chapter{Testes}
 \section{Alternativas, Decisões e Problemas de Implementação}
 \section{Testes realizados e Resultados}
 Devido ao facto do rol de confessados ter bastante informação para ser processada($\approx 37000 linhas$), o grupo decidiu para efeitos de apresentação de testes e resultados desse processamento, apresentar neste relatório uma porção do rol de confessados representativa de todo o tipo de variações de apresentação de tal informação.\\
-Ao processar o rol de confessados verificamos que existe algumas variações de apresentação da informação, isto é, existe registos(linhas do rol de confessados) que os campos não estavam todos preenchidos, mais especificamente o campo 6, e por vezes nesse campo que como foi referido na secção ~\ref{esp},esse campo contém informação que varia entre parentesco e/ou uma descrição relevante para aquele registo. 
-
-\begin{figure}[h!]
-  \centering
-    \includegraphics[width=0.5\textwidth]{anos.png}
-  \caption{Estados\label{estados}}
-\end{figure}
+Ao processar o rol de confessados verificamos que existe algumas variações de apresentação da informação, isto é, existe registos(linhas do rol de confessados) que os campos não estavam todos preenchidos, mais especificamente o campo 6, e por vezes como foi referido na secção \ref{esp},esse campo contém informação que varia entre parentesco e/ou uma descrição relevante para aquele registo.\\
+Abaixo encontra-se a tal porção do rol de processos, onde cada linha representa um registo desse rol e contém os campos referidos na secção \ref{esp}.
+\\
 
 
-%\VerbatimInput{teste1.txt}
+\lstinputlisting{../teste1.txt} %input de um ficheiro
+
+De seguida temos o ficheiro com o resultado da frequência de processos por ano:\\
+
+\lstinputlisting{../anos.txt} %input de um ficheiro
+
+De seguida temos o ficheiro com o resultado da frequência de nomes:\\
+\lstinputlisting{../nomes.txt} %input de um ficheiro
+
+De seguida temos o ficheiro com o resultado da frequência de vároios tipos de relação:\\
+\lstinputlisting{../parentescos.txt} %input de um ficheiro
+
 
 
 \chapter{Conclusão} \label{concl}
-Síntese do Documento~\cite{Martini2016a,Hoare73a}.\\
-Estado final do projecto; Análise crítica dos resultados~\cite{Sto77a}.\\
-Trabalho futuro.
+
+Este projecto mostrou-nos que o Gawk permite-nos programar filtros de texto e relatórios sobre informação de forma muito acessível, principalmente quando existe muito informação para ser processada.\\
+Este projeto está finalizado para o que nos foi proposto.
+E se no futuro houver necessidade de haver uma maior filtragem simplesmente é seguir a estrutura dos filtros presentes e adaptá-los, o que é fácil tendo em conta que o código é bastante simples em termos de funcionamento e bastante legível. 
 
 \appendix
 \chapter{Código do Programa}
 
-%\lstinputlisting{lpp.l} %input de um ficheiro
-%\VerbatimInput{lpp.l}
-\bibliographystyle{alpha}
-%\bibliographystyle{plain}
-%\bibliographystyle{named}
+Lista-se a seguir o código Awk do programa  que foi desenvolvido.
+\begin{verbatim}
+BEGIN {
+    FS="::";
+    IGNORECASE=1
+}
 
-\bibliography{Trabalho1}
+/^\s*$/ { next; }
 
+{ # Alinea (a)
+    split($2, data, /-/);
+    alA[data[1]]++;
+}
 
+{ # Alinea (b)
+    for (i = 3; i < 6; i++) {
+        # Tirar Expostos/Solteiras/etc
+        gsub(/,.*$/, "", $i);
 
+        split($i, nomes, /\s+/);
 
+        for (nome in nomes)
+            alB[nomes[nome]]++;
+    }
+}
 
+# Alinea (c)
+$6 ~ /,\<avo\>([ ]+[mp]atern[oa]s?)?\./        { alC["avo"]++; }
+$6 ~ /,\<irmaos?\>([ ]+[mp]atern[oa]s?)?\./    { alC["irmao"]++; }
+$6 ~ /,\<irmas?\>([ ]+[mp]atern[oa]s?)?\./     { alC["irma"]++; }
+$6 ~ /,\<mae\>\./			       { alC["mae"]++; }
+$6 ~ /,\<madrastas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["madrasta"]++; }
+$6 ~ /,\<padrastos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["padrasto"]++; }
+$6 ~ /,\<madrinhas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["madrinha"]++; }
+$6 ~ /,\<padrinhos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["padrinho"]++; }
+$6 ~ /,\<pai\>\./			       { alC["pai"]++; }
+$6 ~ /,\<primas?\>([ ]+[mp]atern[oa]s?)?\./    { alC["prima"]++; }
+$6 ~ /,\<primos?\>([ ]+[mp]atern[oa]s?)?\./    { alC["primo"]++; }
+$6 ~ /,\<sobrinhas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["sobrinha"]++; }
+$6 ~ /,\<sobrinhos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["sobrinho"]++; }
+$6 ~ /,\<tias?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tia"]++; }
+$6 ~ /,\<tios?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tio"]++; }
 
+function alineaA (outf)
+{
+    printf "Frequencia de processos por ano:\n" > outf;
+    for (ano in alA)
+        printf("%s\t%s\n", ano, alA[ano]) >> outf;
+}
 
+function alineaB (outf)
+{
+    printf "Frequencia de nomes:\n" > outf;
+    for (nome in alB)
+        printf("%s\t%s\n", nome, alB[nome]) >> outf;
+}
 
+function alineaC (outf)
+{
+    printf "Frequencia dos varios tipos de relacao:\n" > outf;
+    for (parentesco in alC)
+        printf("%s\t%s\n", parentesco, alC[parentesco]) >> outf;
+}
 
+END {
+    alineaA("anos.txt");
+    alineaB("nomes.txt");
+    alineaC("parentescos.txt");
+}
 
-
-
-
+\end{verbatim}
 
 
 \end{document} 
