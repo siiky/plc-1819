@@ -1,0 +1,15 @@
+(: Int x 0)
+(: Float y 0.1)
+(: Bool z False)
+(: Bool w)
+(: Int w) # cenas aqui
+(if (== x 2)
+ ((= x 2))
+ ((until z
+   ((: Int w 10)
+    (write "ola")
+    (read x)
+    (= z (== x 2))))))
+
+(if False
+  ((write "xau")))
