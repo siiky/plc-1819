@@ -4,6 +4,7 @@
 #include "lex.yy.h"
 
 int yyerror (const char *s);
+
 %}
 
 %token EQ
@@ -22,6 +23,7 @@ int yyerror (const char *s);
 %token READ
 
 %%
+
 programa : statement
          | statement programa
          ;
@@ -64,7 +66,11 @@ arith_op : '+'
          | '%'
          ;
 
-expression_list : arith_op expression expression ;
+expression_list : arith_op expression expression {
+                /* if (typeof($2) != typeof($3)) error(); */
+                /* gen_op($1, typeof($2)); */
+                }
+                ;
 
 expression2 : VAR
             | BOOL_VALUE
@@ -77,10 +83,15 @@ log_op : EQ
        | NEQ
        | '<'
        | '>'
-       | '~'
        ;
 
-expression2_list : log_op expression expression ;
+expression2_list : '~' expression2
+                 | log_op expression expression {
+                 /* if (typeof($2) != typeof($3)) error(); */
+                 /* gen_op($1, typeof($2)); */
+                 }
+                 ;
+
 %%
 
 int yyerror (const char *s)
