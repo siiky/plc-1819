@@ -61,6 +61,7 @@ arith_op : '+'
          | '*'
          | '-'
          | '/'
+         | '%'
          ;
 
 expression_list : arith_op expression expression ;
