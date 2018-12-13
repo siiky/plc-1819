@@ -4,7 +4,7 @@
 (: Bool w)
 (: Int w) # cenas aqui
 (if (~ (== x 2))
- ((= x 2))
+ ((= x (+ 2 2)))
  ((until z
    ((: Int w 10)
     (write "ola")

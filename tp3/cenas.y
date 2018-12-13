@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "lex.yy.h"
+#include "gen.h"
 
 int yyerror (const char *s);
 
@@ -59,16 +60,16 @@ VALUE : INT_VALUE
       | FLOAT_VALUE
       ;
 
-arith_op : '+'
-         | '*'
-         | '-'
-         | '/'
-         | '%'
+arith_op : '+' { $$ = $1; }
+         | '*' { $$ = $1; }
+         | '-' { $$ = $1; }
+         | '/' { $$ = $1; }
+         | '%' { $$ = $1; }
          ;
 
 expression_list : arith_op expression expression {
                 /* if (typeof($2) != typeof($3)) error(); */
-                /* gen_op($1, typeof($2)); */
+                gen_op($1, 0);
                 }
                 ;
 
@@ -77,18 +78,18 @@ expression2 : VAR
             | '(' expression2_list ')'
             ;
 
-log_op : EQ
-       | LEQ
-       | GEQ
-       | NEQ
-       | '<'
-       | '>'
+log_op : EQ  { $$ = $1; }
+       | LEQ { $$ = $1; }
+       | GEQ { $$ = $1; }
+       | NEQ { $$ = $1; }
+       | '<' { $$ = $1; }
+       | '>' { $$ = $1; }
        ;
 
-expression2_list : '~' expression2
+expression2_list : '~' expression2              { gen_op('~', 0); }
                  | log_op expression expression {
                  /* if (typeof($2) != typeof($3)) error(); */
-                 /* gen_op($1, typeof($2)); */
+                 gen_op($1, 0);
                  }
                  ;
 
@@ -97,10 +98,4 @@ expression2_list : '~' expression2
 int yyerror (const char *s)
 {
   return fprintf(stderr, "ERRO: '%s'\n", s);
-}
-
-int main ()
-{
-    yyparse();
-    return 0;
 }
