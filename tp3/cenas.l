@@ -11,7 +11,7 @@
 "until"                    return UNTIL;
 "if"                       return IF;
 "write"                    return WRITE;
-[:()=+*-/<>~]              return yytext[0];
+[:()=+*-/<>~%]             return yytext[0];
 "True"|"False"             return BOOL_VALUE;
 "Int"|"Float"|"Bool"       return TYPE;
 [a-zA-Z][a-zA-Z]*          return VAR;
