@@ -60,16 +60,15 @@ VALUE : INT_VALUE
       | FLOAT_VALUE
       ;
 
-arith_op : '+' { $$ = $1; }
-         | '*' { $$ = $1; }
-         | '-' { $$ = $1; }
-         | '/' { $$ = $1; }
-         | '%' { $$ = $1; }
+arith_op : '+' { gen_op('+', 0); }
+         | '*' { gen_op('*', 0); }
+         | '-' { gen_op('-', 0); }
+         | '/' { gen_op('/', 0); }
+         | '%' { gen_op('%', 0); }
          ;
 
 expression_list : arith_op expression expression {
                 /* if (typeof($2) != typeof($3)) error(); */
-                gen_op($1, 0);
                 }
                 ;
 
@@ -78,18 +77,17 @@ expression2 : VAR
             | '(' expression2_list ')'
             ;
 
-log_op : EQ  { $$ = $1; }
-       | LEQ { $$ = $1; }
-       | GEQ { $$ = $1; }
-       | NEQ { $$ = $1; }
-       | '<' { $$ = $1; }
-       | '>' { $$ = $1; }
+log_op : EQ  { gen_op(EQ, 0); }
+       | LEQ { gen_op(LEQ, 0); }
+       | GEQ { gen_op(GEQ, 0); }
+       | NEQ { gen_op(NEQ, 0); }
+       | '<' { gen_op('<', 0); }
+       | '>' { gen_op('>', 0); }
        ;
 
 expression2_list : '~' expression2              { gen_op('~', 0); }
                  | log_op expression expression {
                  /* if (typeof($2) != typeof($3)) error(); */
-                 gen_op($1, 0);
                  }
                  ;
 

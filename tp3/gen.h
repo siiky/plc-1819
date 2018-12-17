@@ -3,6 +3,6 @@
 
 #include <stdbool.h>
 
-bool gen_op (unsigned char op, int type);
+bool gen_op (const int op, int type);
 
 #endif /* _GEN_H */

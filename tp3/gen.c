@@ -4,26 +4,23 @@
 
 #include <stdio.h>
 
-const char * _op2inst (const unsigned char op, int type)
+const char * _op2inst (const int op, int type)
 {
-    (void) type;
-    static const char * insts[] = {
-        "ERROR",
-        [EQ]  = "EQUAL",
-        [LEQ] = "INFEQ",
-        [GEQ] = "SUPEQ",
-        [NEQ] = "SUB",
-        ['>'] = "SUP",
-        ['<'] = "INF",
-        ['~'] = "NOT",
-        ['+'] = "ADD",
-        ['*'] = "MUL",
-        ['-'] = "SUB",
-        ['/'] = "DIV",
-        ['%'] = "MOD",
-    };
-
-    return insts[op];
+    switch (op) {
+        case EQ: return "EQUAL";
+        case LEQ: return "INFEQ";
+        case GEQ: return "SUPEQ";
+        case NEQ: return "SUB";
+        case '>': return "SUP";
+        case '<': return "INF";
+        case '~': return "NOT";
+        case '+': return "ADD";
+        case '*': return "MUL";
+        case '-': return "SUB";
+        case '/': return "DIV";
+        case '%': return "MOD";
+        default: return "ERROR";
+    }
 }
 
 bool _gen_inst (const char * inst)
@@ -32,7 +29,7 @@ bool _gen_inst (const char * inst)
     return true;
 }
 
-bool gen_op (unsigned char op, int type)
+bool gen_op (int op, int type)
 {
     return _gen_inst(_op2inst(op, type));
 }
