@@ -6,8 +6,9 @@
 
 const char * _op2inst (const int op, int type)
 {
+    (void) type;
     switch (op) {
-        case EQ: return "EQUAL";
+        case EQ:  return "EQUAL";
         case LEQ: return "INFEQ";
         case GEQ: return "SUPEQ";
         case NEQ: return "SUB";
@@ -19,7 +20,7 @@ const char * _op2inst (const int op, int type)
         case '-': return "SUB";
         case '/': return "DIV";
         case '%': return "MOD";
-        default: return "ERROR";
+        default:  return "ERROR";
     }
 }
 

@@ -9,7 +9,7 @@
    ((: Int w 10)
     (write "ola")
     (read x)
-    (= z (== x 2))))))
+    (= z (>= x 2))))))
 
 (if False
   ((write "xau")))

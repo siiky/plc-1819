@@ -2,11 +2,23 @@
 #include <stdio.h>
 
 #include "lex.yy.h"
+#include "env.h"
 #include "gen.h"
 
 int yyerror (const char *s);
 
 %}
+
+%union {
+    char * valString;
+    float  valFloat;
+    int    valBool;
+    int    valInt;
+    unsigned char valType;
+    struct {
+        unsigned char type;
+    } valExpr;
+}
 
 %token EQ
 %token NEQ
@@ -14,80 +26,114 @@ int yyerror (const char *s);
 %token GEQ
 %token WRITE
 %token IF
-%token BOOL_VALUE
-%token FLOAT_VALUE
 %token UNTIL
-%token INT_VALUE
-%token STR
-%token TYPE
-%token VAR
 %token READ
+
+%token <valBool>  BOOL_VALUE
+%token <valFloat> FLOAT_VALUE
+%token <valInt>   INT_VALUE
+%token <valString>STR
+%token <valString>VAR
+%token <valType>  TYPE
+
+%type <valInt> arith_op
+%type <valInt> log_op
+%type <valExpr>expression
+%type <valExpr>expression_list
+%type <valExpr>expression2
+%type <valExpr>expression2_list
+%type <valExpr>writable
+%type <valType>VALUE
+%type <valExpr>DEFAULT
 
 %%
 
-programa : statement
-         | statement programa
+programa : statements
+         | statements programa
          ;
 
-statement : '(' statement_list ')' ;
+statements : '(' statement ')' ;
 
-statement_list : ':' TYPE VAR DEFAULT
-               | '=' VAR expression
-               | WRITE writable
-               | READ VAR
-               | IF expression2 '(' programa ')' else_clause
-               | UNTIL expression2 '(' programa ')'
-               ;
+statement : ':' TYPE VAR DEFAULT {
+              if ($4.type != TYPE_ERROR && $2 != $4.type)
+                  yyerror("Types don't match");
+              struct var var = { .id = $3, .type = $2, };
+              env_new_var(env, var);
+          }
+          | '=' VAR expression {
+              struct var * v = env_var(env, $2);
+          }
+          | WRITE writable
+          | READ VAR {
+              struct var * v = env_var(env, $2);
+          }
+          | IF expression2 '(' programa ')' else_clause
+          | UNTIL expression2 '(' programa ')'
+          ;
 
-writable : expression
-         | STR
+writable : expression { $$.type = $1.type; }
+         | STR        { $$.type = TYPE_STRING; }
          ;
 
-DEFAULT :
-        | expression
+DEFAULT :            { $$.type = TYPE_ERROR; }
+        | expression { $$.type = $1.type; }
         ;
 
 else_clause :
             | '(' programa ')'
             ;
 
-expression : VALUE
-           | expression2
-           | '(' expression_list ')'
+expression : VALUE                   { $$.type = $1; puts(yytext); }
+           | expression2             { $$.type = $1.type; }
+           | '(' expression_list ')' { $$.type = $2.type; puts(yytext); }
            ;
 
-VALUE : INT_VALUE
-      | FLOAT_VALUE
+VALUE : INT_VALUE   { $$ = TYPE_INT; }
+      | FLOAT_VALUE { $$ = TYPE_FLOAT; }
       ;
 
-arith_op : '+' { gen_op('+', 0); }
-         | '*' { gen_op('*', 0); }
-         | '-' { gen_op('-', 0); }
-         | '/' { gen_op('/', 0); }
-         | '%' { gen_op('%', 0); }
+arith_op : '+' { $$ = '+'; }
+         | '*' { $$ = '*'; }
+         | '-' { $$ = '-'; }
+         | '/' { $$ = '/'; }
+         | '%' { $$ = '%'; }
          ;
 
 expression_list : arith_op expression expression {
-                /* if (typeof($2) != typeof($3)) error(); */
+                    enum type t1 = $2.type;
+                    enum type t2 = $3.type;
+                    if (t1 == TYPE_ERROR || t2 == TYPE_ERROR || t1 != t2)
+                        yyerror("Types don't match");
+                    gen_op($1, t1);
+                    $$.type = t1;
                 }
                 ;
 
-expression2 : VAR
-            | BOOL_VALUE
-            | '(' expression2_list ')'
+expression2 : VAR {
+                if (env_typeof(env, $1) == TYPE_ERROR)
+                    yyerror("Variable not found");
+                $$.type = TYPE_BOOL;
+            }
+            | BOOL_VALUE { $$.type = TYPE_BOOL; puts(yytext); }
+            | '(' expression2_list ')' { $$.type = TYPE_BOOL; }
             ;
 
-log_op : EQ  { gen_op(EQ, 0); }
-       | LEQ { gen_op(LEQ, 0); }
-       | GEQ { gen_op(GEQ, 0); }
-       | NEQ { gen_op(NEQ, 0); }
-       | '<' { gen_op('<', 0); }
-       | '>' { gen_op('>', 0); }
+log_op : EQ  { $$ = EQ;  }
+       | LEQ { $$ = LEQ; }
+       | GEQ { $$ = GEQ; }
+       | NEQ { $$ = NEQ; }
+       | '<' { $$ = '<'; }
+       | '>' { $$ = '>'; }
        ;
 
-expression2_list : '~' expression2              { gen_op('~', 0); }
+expression2_list : '~' expression2              { $$.type = $2.type; gen_op('~', 0); }
                  | log_op expression expression {
-                 /* if (typeof($2) != typeof($3)) error(); */
+                     enum type t1 = $2.type;
+                     enum type t2 = $3.type;
+                     if (t1 == TYPE_ERROR || t2 == TYPE_ERROR || t1 != t2)
+                         yyerror("Types don't match");
+                     gen_op($1, t1);
+                     $$.type = TYPE_BOOL;
                  }
                  ;
 
