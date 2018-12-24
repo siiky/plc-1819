@@ -43,8 +43,12 @@ $6 ~ /,\<tios?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tio"]++; }
 function alineaA (outf)
 {
     printf "Frequencia de processos por ano:\n" > outf;
-    for (ano in alA)
+    total = 0;
+    for (ano in alA) {
+        total += alA[ano];
         printf("%s\t%s\n", ano, alA[ano]) >> outf;
+    }
+    printf("Total\t%s\n", total) >> outf;
 }
 
 function alineaB (outf)
