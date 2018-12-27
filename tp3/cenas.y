@@ -1,25 +1,42 @@
 %{
+#include <stdbool.h>
 #include <stdio.h>
 
-#include "lex.yy.h"
 #include "env.h"
 #include "gen.h"
+#include "str.h"
+#include "rope.h"
+
+#include "lex.yy.h"
 
 int yyerror (const char *s);
+
+#define NDEBUG
+#ifndef NDEBUG
+#define log(FMT, ...) (fprintf(stderr, FMT "\n", __VA_ARGS__))
+#else
+#define log(FMT, ...) ((void) 0)
+#endif /* NDEBUG */
 
 %}
 
 %union {
-    char * valString;
-    float  valFloat;
-    int    valBool;
-    int    valInt;
-    unsigned char valType;
-    struct {
+    struct expr {
+        struct rope   code;
+        struct env *  env;
         unsigned char type;
-    } valExpr;
+    }             valExpr;
+
+    bool          valBool;
+    char *        valString;
+    float         valFloat;
+    int           valInt;
+    struct rope   valCode;
+    unsigned char valType;
 }
 
+%token AND
+%token OR
 %token EQ
 %token NEQ
 %token LEQ
@@ -36,59 +53,123 @@ int yyerror (const char *s);
 %token <valString>VAR
 %token <valType>  TYPE
 
-%type <valInt> arith_op
-%type <valInt> log_op
+%type <valCode>code_block
+%type <valCode>else_clause
+%type <valCode>statement
+%type <valCode>statements
+
+%type <valExpr>DEFAULT
 %type <valExpr>expression
-%type <valExpr>expression_list
 %type <valExpr>expression2
 %type <valExpr>expression2_list
+%type <valExpr>expression_list
 %type <valExpr>writable
+
+%type <valInt> arith_op
+%type <valInt> log_op
+%type <valInt> num_op
+
 %type <valType>VALUE
-%type <valExpr>DEFAULT
 
 %%
 
-programa : statements
-         | statements programa
+programa : code_block {
+             for (rope_iter(&$1); rope_itering(&$1); rope_iter_next(&$1)) {
+                 struct str str = rope_get_nth(&$1, rope_iter_idx(&$1));
+                 if (!str_push(&str, '\0')) {
+                     log();
+                     break;
+                 }
+                 puts(str_as_slice(&str));
+             }
+             $1 = rope_free($1);
+         }
          ;
 
-statements : '(' statement ')' ;
+code_block : statements            { $$ = $1; }
+           | statements code_block {
+               $$ = $1;
+               if (!rope_append(&$$, &$2))
+                   log("Error appending code blocks");
+               $2 = rope_free($2);
+           }
+           ;
+
+statements : '(' statement ')' { $$ = $2; }
+           ;
 
 statement : ':' TYPE VAR DEFAULT {
-              if ($4.type != TYPE_ERROR && $2 != $4.type)
-                  yyerror("Types don't match");
+              if ($4.type > TYPE_ERROR && $4.type < TYPE_DEFAULT && $2 != $4.type)
+                  log("Types don't match:\tDECL: TYPE = %s, DEFAULT = %s\n", type2str($2), type2str($4.type));
+
               struct var var = { .id = $3, .type = $2, };
-              env_new_var(env, var);
+              env_set_var(env, var);
+
+              $$ = $4.code;
           }
           | '=' VAR expression {
               struct var * v = env_var(env, $2);
+              $$ = $3.code;
           }
-          | WRITE writable
+          | WRITE writable {
+              $$ = $2.code;
+              gen_op(&$$, WRITE, $2.type);
+          }
           | READ VAR {
+              $$ = (struct rope) {0};
               struct var * v = env_var(env, $2);
+              if (v == NULL)
+                  log("Variable not found");
+              else
+                  gen_op(&$$, READ, v->type);
           }
-          | IF expression2 '(' programa ')' else_clause
-          | UNTIL expression2 '(' programa ')'
+          | IF expression2 '(' code_block ')' else_clause {
+              $$ = $2.code;
+              if (!rope_append(&$$, &$4) || !rope_append(&$$, &$6))
+                  log("Error appending code blocks!");
+              $4 = rope_free($4);
+              $6 = rope_free($6);
+          }
+          | UNTIL expression2 '(' code_block ')' {
+              $$ = $2.code;
+              if (!rope_append(&$$, &$4))
+                  log("Error appending code blocks!");
+              $4 = rope_free($4);
+          }
           ;
 
-writable : expression { $$.type = $1.type; }
-         | STR        { $$.type = TYPE_STRING; }
+writable : expression {
+             $$.code = $1.code;
+             $$.type = $1.type;
+         }
+         | STR        {
+             $$.code = (struct rope) {0};
+             $$.type = TYPE_STRING;
+             gen_push(&$$.code, TYPE_STRING, yytext, false);
+         }
          ;
 
-DEFAULT :            { $$.type = TYPE_ERROR; }
-        | expression { $$.type = $1.type; }
+DEFAULT : {
+            $$ = (struct expr) {0};
+            $$.type = TYPE_DEFAULT;
+        }
+        | expression { $$ = $1; }
         ;
 
-else_clause :
-            | '(' programa ')'
+else_clause :                    { $$ = (struct rope) {0}; }
+            | '(' code_block ')' { $$ = $2; }
             ;
 
-expression : VALUE                   { $$.type = $1; puts(yytext); }
-           | expression2             { $$.type = $1.type; }
-           | '(' expression_list ')' { $$.type = $2.type; puts(yytext); }
+expression : VALUE {
+               $$ = (struct expr) {0};
+               $$.type = $1;
+               gen_push(&$$.code, $1, yytext, false);
+           }
+           | expression2             { $$ = $1; }
+           | '(' expression_list ')' { $$ = $2; }
            ;
 
-VALUE : INT_VALUE   { $$ = TYPE_INT; }
+VALUE : INT_VALUE   { $$ = TYPE_INT;   }
       | FLOAT_VALUE { $$ = TYPE_FLOAT; }
       ;
 
@@ -100,25 +181,45 @@ arith_op : '+' { $$ = '+'; }
          ;
 
 expression_list : arith_op expression expression {
+                    $$ = (struct expr) {0};
                     enum type t1 = $2.type;
                     enum type t2 = $3.type;
                     if (t1 == TYPE_ERROR || t2 == TYPE_ERROR || t1 != t2)
-                        yyerror("Types don't match");
-                    gen_op($1, t1);
+                        log("Types don't match");
                     $$.type = t1;
+
+                    $$.code = $2.code;
+                    if (!rope_append(&$$.code, &$3.code))
+                        log("Error appending code blocks");
+                    $3.code = rope_free($3.code);
+                    gen_op(&$$.code, $1, t1);
                 }
                 ;
 
 expression2 : VAR {
-                if (env_typeof(env, $1) == TYPE_ERROR)
-                    yyerror("Variable not found");
-                $$.type = TYPE_BOOL;
+                $$ = (struct expr) {0};
+                enum type t = env_typeof(env, $1);
+                if (t == TYPE_ERROR)
+                    log("Variable not found");
+                $$.type = t;
+
+                /* LOAD VARIABLE */
+                /*
+                 gen_load(&$$.code, 
+                 */
             }
-            | BOOL_VALUE { $$.type = TYPE_BOOL; puts(yytext); }
-            | '(' expression2_list ')' { $$.type = TYPE_BOOL; }
+            | BOOL_VALUE {
+                $$.code = (struct rope) {0};
+                $$.type = TYPE_BOOL;
+                gen_push(&$$.code, TYPE_BOOL, NULL, yylval.valBool);
+            }
+            | '(' expression2_list ')' {
+                $$.code = $2.code;
+                $$.type = $2.type;
+            }
             ;
 
-log_op : EQ  { $$ = EQ;  }
+num_op : EQ  { $$ = EQ;  }
        | LEQ { $$ = LEQ; }
        | GEQ { $$ = GEQ; }
        | NEQ { $$ = NEQ; }
@@ -126,14 +227,46 @@ log_op : EQ  { $$ = EQ;  }
        | '>' { $$ = '>'; }
        ;
 
-expression2_list : '~' expression2              { $$.type = $2.type; gen_op('~', 0); }
-                 | log_op expression expression {
+log_op : AND { $$ = AND; }
+       | OR  { $$ = OR;  }
+       ;
+
+expression2_list : '~' expression2 {
+                     enum type t = $2.type;
+                     if (t != TYPE_BOOL)
+                         log("Types don't match");
+                     $$.type = t;
+
+                     $$.code = $2.code;
+
+                     gen_op(&$$.code, '~', $2.type);
+                 }
+                 | num_op expression expression {
                      enum type t1 = $2.type;
                      enum type t2 = $3.type;
                      if (t1 == TYPE_ERROR || t2 == TYPE_ERROR || t1 != t2)
-                         yyerror("Types don't match");
-                     gen_op($1, t1);
+                         log("Types don't match");
                      $$.type = TYPE_BOOL;
+
+                     $$.code = $2.code;
+                     if (!rope_append(&$$.code, &$3.code))
+                         log("Error appending code blocks");
+                     $3.code = rope_free($3.code);
+
+                     gen_op(&$$.code, $1, t1);
+                 }
+                 | log_op expression2 expression2 {
+                     enum type t = $2.type;
+                     if (t != TYPE_BOOL)
+                         log("Types don't match");
+                     $$.type = t;
+
+                     $$.code = $2.code;
+                     if (!rope_append(&$$.code, &$3.code))
+                         log("Error appending code blocks");
+                     $3.code = rope_free($3.code);
+
+                     gen_op(&$$.code, $1, t);
                  }
                  ;
 

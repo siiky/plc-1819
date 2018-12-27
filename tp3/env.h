@@ -9,21 +9,16 @@ struct var {
     char * id;
 
     enum type type;
-
-    union {
-        bool  Bool;
-        float Float;
-        int   Int;
-    } value;
 };
 
 #define VEC_CFG_DATA_TYPE struct var
 #define VEC_CFG_VEC env
 #include "vec.h"
 
-bool         env_new_var (struct env * self, struct var var);
-enum type    env_typeof  (struct env * self, char * id);
-struct var * env_var     (struct env * self, char * id);
+bool         env_set_var    (struct env * self, struct var var);
+enum type    env_typeof     (struct env * self, char * id);
+size_t       env_var_gp_idx (const struct env * self, char * id);
+struct var * env_var        (struct env * self, char * id);
 
 extern struct env * const env;
 

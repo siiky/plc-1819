@@ -3,6 +3,11 @@
 
 #include <stdbool.h>
 
-bool gen_op (const int op, int type);
+#include "str.h"
+#include "rope.h"
+#include "type.h"
+
+bool gen_op   (struct rope * code, const int op, enum type type);
+bool gen_push (struct rope * code, enum type type, const char * arg, bool bv);
 
 #endif /* _GEN_H */

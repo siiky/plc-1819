@@ -4,9 +4,12 @@ EXEC := cenas
 SRC := \
     lex.yy.c \
     y.tab.c  \
-    gen.c    \
     env.c    \
+    gen.c    \
     main.c   \
+    rope.c   \
+    str.c    \
+    type.c   \
 
 OBJS := $(SRC:.c=.o)
 
