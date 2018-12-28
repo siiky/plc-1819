@@ -29,17 +29,16 @@ int yyerror (const char *s);
 
 %union {
     struct expr {
-        struct rope   code;
-        struct env *  env;
-        unsigned char type;
-    }             valExpr;
+        enum type   type;
+        struct rope code;
+    }           valExpr;
 
-    bool          valBool;
-    char *        valString;
-    float         valFloat;
-    int           valInt;
-    struct rope   valCode;
-    unsigned char valType;
+    bool        valBool;
+    char *      valString;
+    enum type   valType;
+    float       valFloat;
+    int         valInt;
+    struct rope valCode;
 }
 
 %token AND
@@ -105,7 +104,7 @@ statements : '(' statement ')' { $$ = $2; }
 
 statement : ':' TYPE VAR DEFAULT {
               if ($4.type > TYPE_ERROR && $4.type < TYPE_DEFAULT && $2 != $4.type)
-                  log("Types don't match:\tDECL: TYPE = %s, DEFAULT = %s\n", type2str($2), type2str($4.type));
+                  log("Type error:\tDECL: TYPE = %s, DEFAULT = %s\n", type2str($2), type2str($4.type));
 
               struct var var = { .id = $3, .type = $2, };
               env_set_var(env, var);
@@ -115,6 +114,7 @@ statement : ':' TYPE VAR DEFAULT {
           | '=' VAR expression {
               struct var * v = env_var(env, $2);
               $$ = $3.code;
+              /* gen_store(); */
           }
           | WRITE writable {
               $$ = $2.code;
@@ -124,7 +124,7 @@ statement : ':' TYPE VAR DEFAULT {
               $$ = (struct rope) {0};
               struct var * v = env_var(env, $2);
               if (v == NULL)
-                  log("Variable not found");
+                  log("Variable not found\n");
               else
                   gen_op(&$$, READ, v->type);
           }
@@ -151,11 +151,12 @@ statement : ':' TYPE VAR DEFAULT {
           ;
 
 writable : expression {
+             $$ = (struct expr) {0};
              $$.code = $1.code;
              $$.type = $1.type;
          }
          | STR        {
-             $$.code = (struct rope) {0};
+             $$ = (struct expr) {0};
              $$.type = TYPE_STRING;
              gen_push(&$$.code, TYPE_STRING, yytext, false);
          }
@@ -197,7 +198,7 @@ expression_list : arith_op expression expression {
                     enum type t1 = $2.type;
                     enum type t2 = $3.type;
                     if (t1 == TYPE_ERROR || t2 == TYPE_ERROR || t1 != t2)
-                        log("Types don't match");
+                        log("Type error: arg1::%s but arg2::%s\n", type2str(t1), type2str(t2));
                     $$.type = t1;
 
                     $$.code = $2.code;
@@ -208,33 +209,35 @@ expression_list : arith_op expression expression {
 
 expression2 : VAR {
                 $$ = (struct expr) {0};
-                enum type t = env_typeof(env, $1);
-                if (t == TYPE_ERROR)
-                    log("Variable not found");
-                $$.type = t;
+                struct var * v = env_var(env, $1);
+                if (v == NULL)
+                    log("Variable not found\n");
+                $$.type = (v != NULL) ?
+                    v->type:
+                    TYPE_ERROR;
 
                 /* LOAD VARIABLE */
                 /*
-                 gen_load(&$$.code, 
+                 gen_load(&$$.code, v);
                  */
             }
             | BOOL_VALUE {
-                $$.code = (struct rope) {0};
+                $$ = (struct expr) {0};
                 $$.type = TYPE_BOOL;
                 gen_push(&$$.code, TYPE_BOOL, NULL, yylval.valBool);
             }
             | '(' expression2_list ')' {
-                $$.code = $2.code;
+                $$ = (struct expr) {0};
                 $$.type = $2.type;
             }
             ;
 
-num_op : EQ  { $$ = EQ;  }
-       | LEQ { $$ = LEQ; }
-       | GEQ { $$ = GEQ; }
-       | NEQ { $$ = NEQ; }
-       | '<' { $$ = '<'; }
+num_op : '<' { $$ = '<'; }
+       | '=' { $$ = '='; }
        | '>' { $$ = '>'; }
+       | GEQ { $$ = GEQ; }
+       | LEQ { $$ = LEQ; }
+       | NEQ { $$ = NEQ; }
        ;
 
 log_op : AND { $$ = AND; }
@@ -244,7 +247,7 @@ log_op : AND { $$ = AND; }
 expression2_list : '~' expression2 {
                      enum type t = $2.type;
                      if (t != TYPE_BOOL)
-                         log("Types don't match");
+                         log("Type error: Expected Bool, got %s\n", type2str(t));
                      $$.type = t;
 
                      $$.code = $2.code;
@@ -255,7 +258,7 @@ expression2_list : '~' expression2 {
                      enum type t1 = $2.type;
                      enum type t2 = $3.type;
                      if (t1 == TYPE_ERROR || t2 == TYPE_ERROR || t1 != t2)
-                         log("Types don't match");
+                         log("Type error: arg1::%s but arg2::%s\n", type2str(t1), type2str(t2));
                      $$.type = TYPE_BOOL;
 
                      $$.code = $2.code;
@@ -263,14 +266,15 @@ expression2_list : '~' expression2 {
                      gen_op(&$$.code, $1, t1);
                  }
                  | log_op expression2 expression2 {
-                     enum type t = $2.type;
-                     if (t != TYPE_BOOL)
-                         log("Types don't match");
-                     $$.type = t;
+                     enum type t1 = $2.type;
+                     enum type t2 = $3.type;
+                     if (t1 != TYPE_BOOL || t2 != TYPE_BOOL)
+                         log("Type error: Expected Bool but arg1::%s and arg2::%s\n", type2str(t1), type2str(t2));
+                     $$.type = t1;
 
                      $$.code = $2.code;
                      cbapp($$.code, $3.code);
-                     gen_op(&$$.code, $1, t);
+                     gen_op(&$$.code, $1, t1);
                  }
                  ;
 

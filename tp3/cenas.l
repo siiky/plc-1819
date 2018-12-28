@@ -13,7 +13,6 @@
 %%
 "&&"                                                                       return AND;
 "||"                                                                       return OR;
-"=="                                                                       return EQ;
 "!="                                                                       return NEQ;
 "<="                                                                       return LEQ;
 ">="                                                                       return GEQ;
