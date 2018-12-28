@@ -11,12 +11,19 @@
 
 int yyerror (const char *s);
 
-#define NDEBUG
 #ifndef NDEBUG
-#define log(FMT, ...) (fprintf(stderr, FMT "\n", __VA_ARGS__))
+#define log(...) (fprintf(stderr, __VA_ARGS__))
 #else
-#define log(FMT, ...) ((void) 0)
+#define log(...) ((void) 0)
 #endif /* NDEBUG */
+
+#define cbapp(self, other) do { \
+    if (!rope_append(&(self), &(other)))            \
+        log("Error appending code blocks: %s:%d\n", \
+            __FILE__,                               \
+            __LINE__);                              \
+    (other) = rope_free(other);                     \
+    } while (0)
 
 %}
 
@@ -77,7 +84,7 @@ programa : code_block {
              for (rope_iter(&$1); rope_itering(&$1); rope_iter_next(&$1)) {
                  struct str str = rope_get_nth(&$1, rope_iter_idx(&$1));
                  if (!str_push(&str, '\0')) {
-                     log();
+                     log("Error adding NULL byte\n");
                      break;
                  }
                  puts(str_as_slice(&str));
@@ -89,9 +96,7 @@ programa : code_block {
 code_block : statements            { $$ = $1; }
            | statements code_block {
                $$ = $1;
-               if (!rope_append(&$$, &$2))
-                   log("Error appending code blocks");
-               $2 = rope_free($2);
+               cbapp($$, $2);
            }
            ;
 
@@ -124,17 +129,24 @@ statement : ':' TYPE VAR DEFAULT {
                   gen_op(&$$, READ, v->type);
           }
           | IF expression2 '(' code_block ')' else_clause {
+              unsigned num = gen_ifno();
+
               $$ = $2.code;
-              if (!rope_append(&$$, &$4) || !rope_append(&$$, &$6))
-                  log("Error appending code blocks!");
-              $4 = rope_free($4);
-              $6 = rope_free($6);
+              gen_jz(&$$, "TIF", num); /* jump to else label */
+              cbapp($$, $4);
+              gen_jump(&$$, "EIF", num); /* jump to endif label */
+              gen_nlbl(&$$, "TIF", num); /* create else label */
+              cbapp($$, $6);
+              gen_nlbl(&$$, "EIF", num); /* create endif label */
           }
           | UNTIL expression2 '(' code_block ')' {
-              $$ = $2.code;
-              if (!rope_append(&$$, &$4))
-                  log("Error appending code blocks!");
-              $4 = rope_free($4);
+              $$ = (struct rope) {0};
+              unsigned num = gen_untilno();
+
+              gen_nlbl(&$$, "UNTIL", num);
+              cbapp($$, $4);
+              cbapp($$, $2.code);
+              gen_jz(&$$, "UNTIL", num);
           }
           ;
 
@@ -189,9 +201,7 @@ expression_list : arith_op expression expression {
                     $$.type = t1;
 
                     $$.code = $2.code;
-                    if (!rope_append(&$$.code, &$3.code))
-                        log("Error appending code blocks");
-                    $3.code = rope_free($3.code);
+                    cbapp($$.code, $3.code);
                     gen_op(&$$.code, $1, t1);
                 }
                 ;
@@ -249,10 +259,7 @@ expression2_list : '~' expression2 {
                      $$.type = TYPE_BOOL;
 
                      $$.code = $2.code;
-                     if (!rope_append(&$$.code, &$3.code))
-                         log("Error appending code blocks");
-                     $3.code = rope_free($3.code);
-
+                     cbapp($$.code, $3.code);
                      gen_op(&$$.code, $1, t1);
                  }
                  | log_op expression2 expression2 {
@@ -262,10 +269,7 @@ expression2_list : '~' expression2 {
                      $$.type = t;
 
                      $$.code = $2.code;
-                     if (!rope_append(&$$.code, &$3.code))
-                         log("Error appending code blocks");
-                     $3.code = rope_free($3.code);
-
+                     cbapp($$.code, $3.code);
                      gen_op(&$$.code, $1, t);
                  }
                  ;

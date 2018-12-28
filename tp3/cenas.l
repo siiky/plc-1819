@@ -10,8 +10,6 @@
 
 %}
 
-%x COMMENT
-
 %%
 "&&"                                                                       return AND;
 "||"                                                                       return OR;
@@ -33,8 +31,7 @@
 -?[0-9]+\.[0-9]*([eE][-+]?[0-9]+)?                                         return FLOAT_VALUE;
 -?[0-9]+                                                                   return INT_VALUE;
 \"([^"]|\\\")*\"                                                           return STR;
-#+[ \t]*                                                                   BEGIN(COMMENT);
-<COMMENT>.*$                                                               { printf("// %s\n", yytext); BEGIN(INITIAL); }
+#+.*$                                                                      ;
 .|\n                                                                       ;
 %%
 

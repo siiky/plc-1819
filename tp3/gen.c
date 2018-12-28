@@ -122,3 +122,51 @@ bool gen_push (struct rope * code, enum type type, const char * arg, bool bv)
         rope_push(code, str):
         (str_free(str), false);
 }
+
+unsigned gen_ifno (void)
+{
+    static unsigned ret = 0;
+    return ret++;
+}
+
+unsigned gen_untilno (void)
+{
+    static unsigned ret = 0;
+    return ret++;
+}
+
+bool gen_jz (struct rope * code, const char * lbl, unsigned num)
+{
+    static char lblnum[10] = "";
+    snprintf(lblnum, 10, "%u", num);
+    struct str str = {0};
+
+    return str_cat(&str, "JZ ")
+        && str_cat(&str, lbl)
+        && str_cat(&str, lblnum)
+        && rope_push(code, str);
+}
+
+bool gen_jump (struct rope * code, const char * lbl, unsigned num)
+{
+    static char lblnum[10] = "";
+    snprintf(lblnum, 10, "%u", num);
+    struct str str = {0};
+
+    return str_cat(&str, "JUMP ")
+        && str_cat(&str, lbl)
+        && str_cat(&str, lblnum)
+        && rope_push(code, str);
+}
+
+bool gen_nlbl (struct rope * code, const char * lbl, unsigned num)
+{
+    static char lblnum[10] = "";
+    snprintf(lblnum, 10, "%u", num);
+    struct str str = {0};
+
+    return str_cat(&str, lbl)
+        && str_cat(&str, lblnum)
+        && str_cat(&str, ":")
+        && rope_push(code, str);
+}

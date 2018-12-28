@@ -729,8 +729,6 @@ VEC_CFG_STATIC bool VEC_APPEND (struct VEC_CFG_VEC * restrict self, struct VEC_C
 {
     if (self == NULL
     || other == NULL
-    || self->ptr == NULL
-    || other->ptr == NULL
     || self->ptr == other->ptr
     || !VEC_RESERVE(self, self->length + other->length))
         return false;
