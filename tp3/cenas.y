@@ -132,21 +132,21 @@ statement : ':' TYPE VAR DEFAULT {
               unsigned num = gen_ifno();
 
               $$ = $2.code;
-              gen_jz(&$$, "TIF", num); /* jump to else label */
-              cbapp($$, $4);
+              gen_jz(&$$, "TIF", num);   /* jump to else label? */
+              cbapp($$, $4);             /* then block */
               gen_jump(&$$, "EIF", num); /* jump to endif label */
-              gen_nlbl(&$$, "TIF", num); /* create else label */
-              cbapp($$, $6);
-              gen_nlbl(&$$, "EIF", num); /* create endif label */
+              gen_nlbl(&$$, "TIF", num); /* else label */
+              cbapp($$, $6);             /* else block (possibly empty) */
+              gen_nlbl(&$$, "EIF", num); /* endif label */
           }
           | UNTIL expression2 '(' code_block ')' {
               $$ = (struct rope) {0};
               unsigned num = gen_untilno();
 
-              gen_nlbl(&$$, "UNTIL", num);
-              cbapp($$, $4);
-              cbapp($$, $2.code);
-              gen_jz(&$$, "UNTIL", num);
+              gen_nlbl(&$$, "UNTIL", num); /* until label */
+              cbapp($$, $4);               /* loop body block */
+              cbapp($$, $2.code);          /* condition */
+              gen_jz(&$$, "UNTIL", num);   /* jump to until label? */
           }
           ;
 
