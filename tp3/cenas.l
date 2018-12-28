@@ -11,8 +11,6 @@
 %}
 
 %%
-"&&"                                                                       return AND;
-"||"                                                                       return OR;
 "!="                                                                       return NEQ;
 "<="                                                                       return LEQ;
 ">="                                                                       return GEQ;
@@ -20,7 +18,7 @@
 "until"                                                                    return UNTIL;
 "if"                                                                       return IF;
 "write"                                                                    return WRITE;
-[:()=+*-/<>~%]                                                             return yytext[0];
+[:()=+*-/<>~%&|]                                                           return yytext[0];
 "False"                               { yylval.valBool   = false;          return BOOL_VALUE; }
 "True"                                { yylval.valBool   = true;           return BOOL_VALUE; }
 "Bool"                                { yylval.valType   = TYPE_BOOL;      return TYPE; }

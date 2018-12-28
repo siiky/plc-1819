@@ -7,9 +7,9 @@
 static const char * op2inst_bool (const int op)
 {
     switch (op) {
+        case   '&': return "MUL";
+        case   '|': return "ADD";
         case   '~': return "NOT";
-        case   AND: return "MUL";
-        case    OR: return "ADD";
         case WRITE: return "WRITEI";
         default:  return NULL;
     }
@@ -18,13 +18,13 @@ static const char * op2inst_bool (const int op)
 static const char * op2inst_int (const int op)
 {
     switch (op) {
-        case    EQ: return "EQUAL";
         case   '%': return "MOD";
         case   '*': return "MUL";
         case   '+': return "ADD";
         case   '-': return "SUB";
         case   '/': return "DIV";
         case   '<': return "INF";
+        case   '=': return "EQUAL";
         case   '>': return "SUP";
         case   GEQ: return "SUPEQ";
         case   LEQ: return "INFEQ";
@@ -37,13 +37,13 @@ static const char * op2inst_int (const int op)
 static const char * op2inst_float (const int op)
 {
     switch (op) {
-        case    EQ: return "EQUAL";
         case   '%': return "FMOD";
         case   '*': return "FMUL";
         case   '+': return "FADD";
         case   '-': return "FSUB";
         case   '/': return "FDIV";
         case   '<': return "FINF";
+        case   '=': return "EQUAL";
         case   '>': return "FSUP";
         case   GEQ: return "FSUPEQ";
         case   LEQ: return "FINFEQ";

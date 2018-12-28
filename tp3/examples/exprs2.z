@@ -1,0 +1,2 @@
+(write (& True True))
+(write (| True False))

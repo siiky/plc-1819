@@ -728,9 +728,13 @@ VEC_CFG_STATIC VEC_CFG_DATA_TYPE VEC_POP (struct VEC_CFG_VEC * self)
 VEC_CFG_STATIC bool VEC_APPEND (struct VEC_CFG_VEC * restrict self, struct VEC_CFG_VEC * restrict other)
 {
     if (self == NULL
-    || other == NULL
-    || self->ptr == other->ptr
-    || !VEC_RESERVE(self, self->length + other->length))
+    || other == NULL)
+        return false;
+
+    if (VEC_IS_EMPTY(other))
+        return true;
+
+    if (!VEC_RESERVE(self, self->length + other->length))
         return false;
 
     VEC_CFG_DATA_TYPE * dest = self->ptr + self->length;

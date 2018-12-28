@@ -3,7 +3,7 @@
 (: Bool z False)
 (: Bool w)
 (: Int w) # cenas aqui
-(if (~ (== x 2))
+(if (~ (= x 2))
  ((= x (+ 2 2)))
  ((until z
    ((: Int w 10)
