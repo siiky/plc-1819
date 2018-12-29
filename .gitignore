@@ -61,3 +61,9 @@ dkms.conf
 
 lex.yy.c
 lpp
+tp3/VMdocpt.pdf
+tp3/cenas
+tp3/examples/*.vm
+tp3/lex.yy.*
+tp3/vms/
+tp3/y.tab.*

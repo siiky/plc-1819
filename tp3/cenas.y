@@ -134,7 +134,8 @@ statement : ':' TYPE VAR DEFAULT { trace();
                   err("Type error:\tDECL: TYPE = %s, DEFAULT = %s\n", type2str($2), type2str($4.type));
 
               struct var var = { .id = $3, .type = $2, };
-              env_set_var(env, var);
+              if (!env_new_var(env, var))
+                  err("creating variable `%s`\n", $3);
 
               $$ = $4.code;
           }

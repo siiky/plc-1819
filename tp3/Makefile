@@ -23,6 +23,8 @@ CFLAGS := \
     -static             \
     -std=c11            \
 
+EXAMPLES := $(patsubst %.z,%.vm,$(wildcard examples/*.z))
+
 all: $(EXEC)
 
 $(EXEC): $(OBJS)
@@ -47,6 +49,11 @@ main.o: main.c y.tab.h
 	$(CC) $(CFLAGS) -c main.c -o $@
 
 clean:
-	$(RM) $(OBJS) lex.yy.c lex.yy.h y.tab.c y.tab.h cenas
+	$(RM) $(OBJS) $(EXAMPLES) lex.yy.c lex.yy.h y.tab.c y.tab.h cenas
 
-.PHONY: all clean
+examples: all $(EXAMPLES)
+
+%.vm: %.z
+	./$(EXEC) < $< > $@
+
+.PHONY: all clean examples
