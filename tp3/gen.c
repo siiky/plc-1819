@@ -81,15 +81,18 @@ static const char * _type2inst (const int op, enum type type)
         NULL;
 }
 
+static bool _gen_inst (struct rope * code, const char * inst)
+{
+    struct str str = {0};
+    return str_cat(&str, inst)
+        && rope_push(code, str);
+}
+
 bool gen_op (struct rope * code, const int op, enum type type)
 {
     const char * inst = _type2inst(op, type);
-    struct str str = {0};
-
-    return (inst != NULL
-            && str_cat(&str, inst)
-            && rope_push(code, str))
-        || (str_free(str), false);
+    return inst != NULL
+        && _gen_inst(code, inst);
 }
 
 bool gen_push (struct rope * code, enum type type, const char * arg, bool bv)
@@ -167,5 +170,30 @@ bool gen_nlbl (struct rope * code, const char * lbl, unsigned num)
     return str_cat(&str, lbl)
         && str_cat(&str, lblnum)
         && str_cat(&str, ":")
+        && rope_push(code, str);
+}
+
+bool gen_pushgp (struct rope * code)
+{
+    return _gen_inst(code, "PUSHGP");
+}
+
+bool gen_storeg (struct rope * code, unsigned gidx)
+{
+    snprintf(lblnum, 10, "%u", gidx);
+    struct str str = {0};
+
+    return str_cat(&str, "STOREG ")
+        && str_cat(&str, lblnum)
+        && rope_push(code, str);
+}
+
+bool gen_load (struct rope * code, unsigned gidx)
+{
+    snprintf(lblnum, 10, "%u", gidx);
+    struct str str = {0};
+
+    return str_cat(&str, "LOAD ")
+        && str_cat(&str, lblnum)
         && rope_push(code, str);
 }

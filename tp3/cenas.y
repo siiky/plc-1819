@@ -28,7 +28,7 @@ int yyerror (const char *s);
 #define trace(...) ((void) 0)
 #endif /* TRACE */
 
-#define type_valid(t) ((t) > TYPE_ERROR && (t) < TYPE_DEFAULT)
+#define type_valid(t)       ((t) > TYPE_ERROR && (t) < TYPE_DEFAULT)
 #define type_compat(t1, t2) ((t1) == (t2))
 
 /**
@@ -46,17 +46,23 @@ int yyerror (const char *s);
  * Gera wrappers para funcoes geradoras de codigo que imprimem
  * uma mensagem em caso de erro
  */
-#define gen_(f, ...)           \
-    (((f)(__VA_ARGS__)) ?      \
-        true:                  \
-        (err(#f "(): %s:%d\n", \
+#define gen_(f, ...)            \
+    (((gen_##f)(__VA_ARGS__)) ? \
+        true:                   \
+        (err(#f "(): %s:%d\n",  \
             __FILE__, __LINE__), false))
 
-#define gen_jump(c, l, n)    gen_(gen_jump, (c), (l), (n))
-#define gen_jz(  c, l, n)    gen_(gen_jz,   (c), (l), (n))
-#define gen_nlbl(c, l, n)    gen_(gen_nlbl, (c), (l), (n))
-#define gen_op(  c, o, t)    gen_(gen_op,   (c), (o), (t))
-#define gen_push(c, t, a, b) gen_(gen_push, (c), (t), (a), (b))
+#define gen_jump(  c, l, n)    gen_(jump,   (c), (l), (n))
+#define gen_jz(    c, l, n)    gen_(jz,     (c), (l), (n))
+#define gen_load(  c, i)       gen_(load, (c), (i))
+#define gen_nlbl(  c, l, n)    gen_(nlbl,   (c), (l), (n))
+#define gen_op(    c, o, t)    gen_(op,     (c), (o), (t))
+#define gen_push(  c, t, a, b) gen_(push,   (c), (t), (a), (b))
+#define gen_pushgp(c)          gen_(pushgp, (c))
+#define gen_storeg(c, i)       gen_(storeg, (c), (i))
+
+static struct rope _var_decs = {0};
+static struct rope * const var_decs = &_var_decs;
 
 %}
 
@@ -110,7 +116,7 @@ int yyerror (const char *s);
 %%
 
 programa : code_block { trace();
-             /* TODO: print vars */
+             rope_fprint(var_decs, yyout);
              fputs("START\n", yyout);
              rope_fprint(&$1, yyout);
              fputs("STOP\n", yyout);
@@ -136,16 +142,17 @@ statement : ':' TYPE VAR DEFAULT { trace();
               struct var var = { .id = $3, .type = $2, };
               if (!env_new_var(env, var))
                   err("creating variable `%s`\n", $3);
-
               $$ = $4.code;
+              gen_storeg(&$$, env_var_gp_idx(env, $3));
+
+              gen_push(var_decs, $2, "0", yylval.valBool);
           }
           | '=' VAR expression { trace();
               struct var * v = env_var(env, $2);
               if (v == NULL)
                   err("Variable not found: `%s`\n", $2);
               $$ = $3.code;
-              /* TODO: STORE */
-              /* gen_store(&$$); */
+              gen_storeg(&$$, env_var_gp_idx(env, $2));
           }
           | WRITE writable { trace();
               $$ = $2.code;
@@ -159,7 +166,7 @@ statement : ':' TYPE VAR DEFAULT { trace();
                   err("Variable not found: `%s`\n", $2);
               else
                   gen_op(&$$, READ, v->type);
-              /* gen_store(&$); */
+              /* gen_storeg(&$); */
           }
           | IF expression2 '(' code_block ')' else_clause { trace();
               unsigned num = gen_ifno();
@@ -242,10 +249,8 @@ expression2 : VAR { trace();
                 if (!type_valid($$.type))
                     err("Variable not found: `%s`\n", $1);
 
-                /* TODO: LOAD VARIABLE */
-                /*
-                 gen_load(&$$.code, v);
-                 */
+                gen_pushgp(&$$.code);
+                gen_load(&$$.code, env_var_gp_idx(env, $1));
             }
             | BOOL_VALUE { trace();
                 $$ = (struct expr) {0};

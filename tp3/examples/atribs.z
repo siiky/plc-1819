@@ -1,6 +1,2 @@
 (: Int x)
 (: Int y 2)
-(: Float x)
-(: Float y 2.0)
-(: Bool x)
-(: Bool y True)
