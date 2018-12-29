@@ -98,32 +98,21 @@ bool gen_op (struct rope * code, const int op, enum type type)
 bool gen_push (struct rope * code, enum type type, const char * arg, bool bv)
 {
     struct str str = {0};
-    bool ret = true;
+    char t[3] = "\0 ";
 
     switch (type) {
-        case TYPE_BOOL:
-            ret = str_cat(&str, "PUSHI ")
-                && str_cat(&str, ((bv) ? "1" : "0"));
-            break;
-        case TYPE_FLOAT:
-            ret = str_cat(&str, "PUSHF ")
-                && str_cat(&str, arg);
-            break;
-        case TYPE_INT:
-            ret = str_cat(&str, "PUSHI ")
-                && str_cat(&str, arg);
-            break;
-        case TYPE_STRING:
-            ret = str_cat(&str, "PUSHS ")
-                && str_cat(&str, arg);
-            break;
-        default:
-            return false;
+        case TYPE_BOOL:   arg = ((bv) ? "1" : "0");
+        case TYPE_INT:    *t = 'I'; break;
+        case TYPE_FLOAT:  *t = 'F'; break;
+        case TYPE_STRING: *t = 'S'; break;
+        default: return false;
     }
 
-    return (ret) ?
-        rope_push(code, str):
-        (str_free(str), false);
+    return (str_cat(&str, "PUSH")
+            && str_cat(&str, t)
+            && str_cat(&str, arg)
+            && rope_push(code, str))
+        || (str_free(str), false);
 }
 
 unsigned gen_ifno (void)

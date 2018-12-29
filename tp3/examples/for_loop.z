@@ -1,0 +1,4 @@
+(: Int i 0)
+(until (>= i 10)
+  ((print i)
+   (++ i)))

@@ -1,0 +1,12 @@
+(: Int i 0)
+(: Int j 0)
+
+(until (>= i 10)
+  ((write "i = ")
+   (print i)
+   (= j 0)
+   (until (>= j 10)
+     ((write "    j = ")
+      (print j)
+      (++ j)))
+   (++ i)))

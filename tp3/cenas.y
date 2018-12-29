@@ -80,13 +80,15 @@ static struct rope * const var_decs = &_var_decs;
     struct rope valCode;
 }
 
-%token NEQ
-%token LEQ
+%token INC
 %token GEQ
-%token WRITE
 %token IF
-%token UNTIL
+%token LEQ
+%token NEQ
+%token PRINT
 %token READ
+%token UNTIL
+%token WRITE
 
 %token <valBool>  BOOL_VALUE
 %token <valFloat> FLOAT_VALUE
@@ -137,7 +139,7 @@ statements : '(' statement ')' { trace(); $$ = $2; }
 statement : ':' TYPE VAR DEFAULT { trace();
               if ($4.type == TYPE_ERROR
               || (type_valid($4.type) && !type_compat($2, $4.type)))
-                  err("Type error:\tDECL: TYPE = %s, DEFAULT = %s\n", type2str($2), type2str($4.type));
+                  err("type: DECL: TYPE = %s, DEFAULT = %s\n", type2str($2), type2str($4.type));
 
               struct var var = { .id = $3, .type = $2, };
               if (!env_new_var(env, var))
@@ -146,6 +148,26 @@ statement : ':' TYPE VAR DEFAULT { trace();
               gen_storeg(&$$, env_var_gp_idx(env, $3));
 
               gen_push(var_decs, $2, "0", yylval.valBool);
+          }
+          | INC VAR { trace();
+              $$ = (struct rope) {0};
+              struct var * v = env_var(env, $2);
+              enum type t = env_typeof(env, $2);
+              unsigned gidx = env_var_gp_idx(env, $2);
+
+              if (v == NULL)
+                  err("Variable not found: `%s`\n", $2);
+
+              if (t != TYPE_INT && t != TYPE_FLOAT)
+                  err("type: Expected Int or Float, got %s\n", type2str(t));
+
+              const char * arg = (t == TYPE_INT) ? "1" : "1.0";
+
+              gen_pushgp(&$$);
+              gen_load(&$$, gidx);
+              gen_push(&$$, t, arg, false);
+              gen_op(&$$, '+', t);
+              gen_storeg(&$$, gidx);
           }
           | '=' VAR expression { trace();
               struct var * v = env_var(env, $2);
@@ -157,6 +179,14 @@ statement : ':' TYPE VAR DEFAULT { trace();
           | WRITE writable { trace();
               $$ = $2.code;
               gen_op(&$$, WRITE, $2.type);
+              //gen_push(&$$, TYPE_STRING, "\"\\n\"", false);
+              //gen_op(&$$, WRITE, TYPE_STRING);
+          }
+          | PRINT writable { trace();
+              $$ = $2.code;
+              gen_op(&$$, WRITE, $2.type);
+              gen_push(&$$, TYPE_STRING, "\"\\n\"", false);
+              gen_op(&$$, WRITE, TYPE_STRING);
           }
           | READ VAR { trace();
               /* TODO: READ and convert */
@@ -234,7 +264,7 @@ expression_list : arith_op expression expression { trace();
                     enum type t1 = $2.type;
                     enum type t2 = $3.type;
                     if (t1 == TYPE_ERROR || t2 == TYPE_ERROR || t1 != t2)
-                        err("Type error: op1::%s and op2::%s\n", type2str(t1), type2str(t2));
+                        err("type: op1::%s and op2::%s\n", type2str(t1), type2str(t2));
                     $$.type = t1;
 
                     $$.code = $2.code;
@@ -276,7 +306,7 @@ expression2_list : '~' expression2 { trace();
                      $$ = (struct expr) {0};
                      enum type t = $2.type;
                      if (t != TYPE_BOOL)
-                         err("Type error: Expected Bool, got %s\n", type2str(t));
+                         err("type: Expected Bool, got %s\n", type2str(t));
                      $$.type = t;
 
                      $$.code = $2.code;
@@ -288,7 +318,7 @@ expression2_list : '~' expression2 { trace();
                      enum type t1 = $2.type;
                      enum type t2 = $3.type;
                      if (!type_valid(t1) || !type_valid(t2) || !type_compat(t1, t2))
-                         err("Type error: op1::%s and op2::%s\n", type2str(t1), type2str(t2));
+                         err("type: op1::%s and op2::%s\n", type2str(t1), type2str(t2));
                      $$.type = TYPE_BOOL;
 
                      $$.code = $2.code;
@@ -299,7 +329,7 @@ expression2_list : '~' expression2 { trace();
                      enum type t1 = $2.type;
                      enum type t2 = $3.type;
                      if (t1 != TYPE_BOOL || t2 != TYPE_BOOL)
-                         err("Type error: Expected Bool but op1::%s and op2::%s\n", type2str(t1), type2str(t2));
+                         err("type: Expected Bool but op1::%s and op2::%s\n", type2str(t1), type2str(t2));
 
                      $$ = $2;
 

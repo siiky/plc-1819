@@ -12,12 +12,14 @@
 
 %%
 "!="                                                                       return NEQ;
+"++"                                                                       return INC;
 "<="                                                                       return LEQ;
 ">="                                                                       return GEQ;
 "read"                                                                     return READ;
 "until"                                                                    return UNTIL;
 "if"                                                                       return IF;
 "write"                                                                    return WRITE;
+"print"                                                                    return PRINT;
 [:()=+*-/<>~%&|]                                                           return yytext[0];
 "False"                               { yylval.valBool   = false;          return BOOL_VALUE; }
 "True"                                { yylval.valBool   = true;           return BOOL_VALUE; }
