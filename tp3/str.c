@@ -26,3 +26,25 @@ bool str_cat (struct str * self, const char * cstr)
 
     return ret;
 }
+
+bool str_fprint (const struct str * self, FILE * out)
+{
+    if (self == NULL || out == NULL)
+        return false;
+
+    size_t len = self->length;
+    for (size_t i = 0; i < len; i++)
+        fputc(self->ptr[i], out);
+
+    return true;
+}
+
+bool str_eprint (const struct str * self)
+{
+    return str_fprint(self, stderr);
+}
+
+bool str_print (const struct str * self)
+{
+    return str_fprint(self, stdout);
+}

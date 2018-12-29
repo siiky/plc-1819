@@ -135,9 +135,10 @@ unsigned gen_untilno (void)
     return ret++;
 }
 
+static char lblnum[10] = "";
+
 bool gen_jz (struct rope * code, const char * lbl, unsigned num)
 {
-    static char lblnum[10] = "";
     snprintf(lblnum, 10, "%u", num);
     struct str str = {0};
 
@@ -149,7 +150,6 @@ bool gen_jz (struct rope * code, const char * lbl, unsigned num)
 
 bool gen_jump (struct rope * code, const char * lbl, unsigned num)
 {
-    static char lblnum[10] = "";
     snprintf(lblnum, 10, "%u", num);
     struct str str = {0};
 
@@ -161,7 +161,6 @@ bool gen_jump (struct rope * code, const char * lbl, unsigned num)
 
 bool gen_nlbl (struct rope * code, const char * lbl, unsigned num)
 {
-    static char lblnum[10] = "";
     snprintf(lblnum, 10, "%u", num);
     struct str str = {0};
 
