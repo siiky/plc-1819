@@ -197,9 +197,13 @@ statement : ':' TYPE VAR DEFAULT { trace();
               struct var * v = env_var(env, $2);
               if (v == NULL)
                   err("Variable not found: `%s`\n", $2);
-              else
-                  gen_op(&$$, READ, v->type);
-              /* gen_storeg(&$); */
+
+              if (v->type != TYPE_INT && v->type != TYPE_FLOAT)
+                  err("`read`: Expected Int or Float, got %s\n", type2str(v->type));
+
+              gen_read(&$$);
+              gen_aton(&$$, v->type);
+              gen_storeg(&$$, env_var_gp_idx(env, $2));
           }
           | IF expression2 '(' code_block ')' else_clause { trace();
               unsigned num = gen_ifno();

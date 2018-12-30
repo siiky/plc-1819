@@ -1,0 +1,11 @@
+(: Int x)
+(: Float y)
+
+(read x)
+(read y)
+
+(write "x = ")
+(print x)
+
+(write "y = ")
+(print y)

@@ -88,6 +88,64 @@ static bool _gen_inst (struct rope * code, const char * inst)
         && rope_push(code, str);
 }
 
+static char lblnum[10] = "";
+
+bool gen_aton (struct rope * code, enum type type)
+{
+    const char * inst = NULL;
+
+    switch (type) {
+        case TYPE_INT:   inst = "ATOI"; break;
+        case TYPE_FLOAT: inst = "ATOF"; break;
+        default: break;
+    }
+
+    return _gen_inst(code, inst);
+}
+
+bool gen_jump (struct rope * code, const char * lbl, unsigned num)
+{
+    snprintf(lblnum, 10, "%u", num);
+    struct str str = {0};
+
+    return str_cat(&str, "JUMP ")
+        && str_cat(&str, lbl)
+        && str_cat(&str, lblnum)
+        && rope_push(code, str);
+}
+
+bool gen_jz (struct rope * code, const char * lbl, unsigned num)
+{
+    snprintf(lblnum, 10, "%u", num);
+    struct str str = {0};
+
+    return str_cat(&str, "JZ ")
+        && str_cat(&str, lbl)
+        && str_cat(&str, lblnum)
+        && rope_push(code, str);
+}
+
+bool gen_load (struct rope * code, unsigned gidx)
+{
+    snprintf(lblnum, 10, "%u", gidx);
+    struct str str = {0};
+
+    return str_cat(&str, "LOAD ")
+        && str_cat(&str, lblnum)
+        && rope_push(code, str);
+}
+
+bool gen_nlbl (struct rope * code, const char * lbl, unsigned num)
+{
+    snprintf(lblnum, 10, "%u", num);
+    struct str str = {0};
+
+    return str_cat(&str, lbl)
+        && str_cat(&str, lblnum)
+        && str_cat(&str, ":")
+        && rope_push(code, str);
+}
+
 bool gen_op (struct rope * code, const int op, enum type type)
 {
     const char * inst = _type2inst(op, type);
@@ -115,56 +173,14 @@ bool gen_push (struct rope * code, enum type type, const char * arg, bool bv)
         || (str_free(str), false);
 }
 
-unsigned gen_ifno (void)
-{
-    static unsigned ret = 0;
-    return ret++;
-}
-
-unsigned gen_untilno (void)
-{
-    static unsigned ret = 0;
-    return ret++;
-}
-
-static char lblnum[10] = "";
-
-bool gen_jz (struct rope * code, const char * lbl, unsigned num)
-{
-    snprintf(lblnum, 10, "%u", num);
-    struct str str = {0};
-
-    return str_cat(&str, "JZ ")
-        && str_cat(&str, lbl)
-        && str_cat(&str, lblnum)
-        && rope_push(code, str);
-}
-
-bool gen_jump (struct rope * code, const char * lbl, unsigned num)
-{
-    snprintf(lblnum, 10, "%u", num);
-    struct str str = {0};
-
-    return str_cat(&str, "JUMP ")
-        && str_cat(&str, lbl)
-        && str_cat(&str, lblnum)
-        && rope_push(code, str);
-}
-
-bool gen_nlbl (struct rope * code, const char * lbl, unsigned num)
-{
-    snprintf(lblnum, 10, "%u", num);
-    struct str str = {0};
-
-    return str_cat(&str, lbl)
-        && str_cat(&str, lblnum)
-        && str_cat(&str, ":")
-        && rope_push(code, str);
-}
-
 bool gen_pushgp (struct rope * code)
 {
     return _gen_inst(code, "PUSHGP");
+}
+
+bool gen_read (struct rope * code)
+{
+    return _gen_inst(code, "READ");
 }
 
 bool gen_storeg (struct rope * code, unsigned gidx)
@@ -177,12 +193,14 @@ bool gen_storeg (struct rope * code, unsigned gidx)
         && rope_push(code, str);
 }
 
-bool gen_load (struct rope * code, unsigned gidx)
+unsigned gen_ifno (void)
 {
-    snprintf(lblnum, 10, "%u", gidx);
-    struct str str = {0};
+    static unsigned ret = 0;
+    return ret++;
+}
 
-    return str_cat(&str, "LOAD ")
-        && str_cat(&str, lblnum)
-        && rope_push(code, str);
+unsigned gen_untilno (void)
+{
+    static unsigned ret = 0;
+    return ret++;
 }
