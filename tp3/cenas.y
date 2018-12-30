@@ -139,15 +139,21 @@ statements : '(' statement ')' { trace(); $$ = $2; }
 statement : ':' TYPE VAR DEFAULT { trace();
               if ($4.type == TYPE_ERROR
               || (type_valid($4.type) && !type_compat($2, $4.type)))
-                  err("type: DECL: TYPE = %s, DEFAULT = %s\n", type2str($2), type2str($4.type));
+                  err("type: DECL: TYPE = %s, DEFAULT = %s\n",
+                      type2str($2),
+                      type2str($4.type));
 
               struct var var = { .id = $3, .type = $2, };
               if (!env_new_var(env, var))
                   err("creating variable `%s`\n", $3);
-              $$ = $4.code;
-              gen_storeg(&$$, env_var_gp_idx(env, $3));
 
-              gen_push(var_decs, $2, "0", yylval.valBool);
+              $$ = $4.code;
+              if (!rope_is_empty(&$$))
+                  gen_storeg(&$$, env_var_gp_idx(env, $3));
+
+              gen_push(var_decs, $2,
+                  (($2 == TYPE_FLOAT) ? "0.0" : "0"),
+                  yylval.valBool);
           }
           | INC VAR { trace();
               $$ = (struct rope) {0};
@@ -179,8 +185,6 @@ statement : ':' TYPE VAR DEFAULT { trace();
           | WRITE writable { trace();
               $$ = $2.code;
               gen_op(&$$, WRITE, $2.type);
-              //gen_push(&$$, TYPE_STRING, "\"\\n\"", false);
-              //gen_op(&$$, WRITE, TYPE_STRING);
           }
           | PRINT writable { trace();
               $$ = $2.code;
@@ -189,7 +193,6 @@ statement : ':' TYPE VAR DEFAULT { trace();
               gen_op(&$$, WRITE, TYPE_STRING);
           }
           | READ VAR { trace();
-              /* TODO: READ and convert */
               $$ = (struct rope) {0};
               struct var * v = env_var(env, $2);
               if (v == NULL)
@@ -202,12 +205,12 @@ statement : ':' TYPE VAR DEFAULT { trace();
               unsigned num = gen_ifno();
 
               $$ = $2.code;
-              gen_jz(&$$, "TIF", num);   /* jump to else label? */
-              cbapp($$, $4);             /* then block */
-              gen_jump(&$$, "EIF", num); /* jump to endif label */
-              gen_nlbl(&$$, "TIF", num); /* else label */
-              cbapp($$, $6);             /* else block (possibly empty) */
-              gen_nlbl(&$$, "EIF", num); /* endif label */
+              gen_jz(&$$, "ELSE", num);    /* jump to else label? */
+              cbapp($$, $4);               /* then block */
+              gen_jump(&$$, "ENDIF", num); /* jump to endif label */
+              gen_nlbl(&$$, "ELSE", num);  /* else label */
+              cbapp($$, $6);               /* else block (possibly empty) */
+              gen_nlbl(&$$, "ENDIF", num); /* endif label */
           }
           | UNTIL expression2 '(' code_block ')' { trace();
               $$ = (struct rope) {0};
@@ -264,7 +267,10 @@ expression_list : arith_op expression expression { trace();
                     enum type t1 = $2.type;
                     enum type t2 = $3.type;
                     if (t1 == TYPE_ERROR || t2 == TYPE_ERROR || t1 != t2)
-                        err("type: op1::%s and op2::%s\n", type2str(t1), type2str(t2));
+                        err("`%c`: Types don't match: op1:%s and op2:%s\n",
+                            $1,
+                            type2str(t1),
+                            type2str(t2));
                     $$.type = t1;
 
                     $$.code = $2.code;
@@ -306,7 +312,7 @@ expression2_list : '~' expression2 { trace();
                      $$ = (struct expr) {0};
                      enum type t = $2.type;
                      if (t != TYPE_BOOL)
-                         err("type: Expected Bool, got %s\n", type2str(t));
+                         err("`~`: Expected Bool, got %s\n", type2str(t));
                      $$.type = t;
 
                      $$.code = $2.code;
@@ -318,7 +324,10 @@ expression2_list : '~' expression2 { trace();
                      enum type t1 = $2.type;
                      enum type t2 = $3.type;
                      if (!type_valid(t1) || !type_valid(t2) || !type_compat(t1, t2))
-                         err("type: op1::%s and op2::%s\n", type2str(t1), type2str(t2));
+                         err("`%c`: Types don't match: op1:%s and op2:%s\n",
+                             $1,
+                             type2str(t1),
+                             type2str(t2));
                      $$.type = TYPE_BOOL;
 
                      $$.code = $2.code;
@@ -329,7 +338,10 @@ expression2_list : '~' expression2 { trace();
                      enum type t1 = $2.type;
                      enum type t2 = $3.type;
                      if (t1 != TYPE_BOOL || t2 != TYPE_BOOL)
-                         err("type: Expected Bool but op1::%s and op2::%s\n", type2str(t1), type2str(t2));
+                         err("`%c`: Expected Bool, got op1:%s and op2:%s\n",
+                             $1,
+                             type2str(t1),
+                             type2str(t2));
 
                      $$ = $2;
 
