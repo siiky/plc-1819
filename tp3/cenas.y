@@ -11,19 +11,19 @@
 
 int yyerror (const char *s);
 
-/** Mensagens de erro */
-#define err(...) ((void) fprintf(stderr, "ERR: " __VA_ARGS__))
+/**
+ * Verifica se uma condicao e verdadeira e, caso nao seja,
+ * imprime uma mensagem de erro e aborta o programa
+ */
+#define assert(cond, ...)                       \
+    if (!(cond)) do {                           \
+        fprintf(stderr, "ERROR: " __VA_ARGS__); \
+        return 1;                               \
+    } while (0)
 
-#ifndef NDEBUG
-/** Mensagens para debugging */
-#define log(...) ((void) fprintf(stderr, "LOG: " __VA_ARGS__))
-#else
-#define log(...) ((void) 0)
-#endif /* NDEBUG */
-
-/** Mostra as producoes por onde passa */
+/** Se activado, mostra as producoes por onde passa */
 #ifdef TRACE
-#define trace(...) (log("TRACE: %s:%d\n", __FILE__, __LINE__))
+#define trace(...) ((void) fprintf(stderr, "TRACE: %s:%d\n", __FILE__, __LINE__))
 #else
 #define trace(...) ((void) 0)
 #endif /* TRACE */
@@ -35,27 +35,26 @@ int yyerror (const char *s);
  * Concatena dois blocos de codigo, @a self e @a other, e imprime
  * uma mensagem em caso de erro
  */
-#define cbapp(self, other) do { \
-    if (!rope_append(&(self), &(other)))      \
-        err("appending code blocks: %s:%d\n", \
-            __FILE__, __LINE__);              \
-    (other) = rope_free(other);               \
+#define cbapp(self, other) do {                \
+        assert(rope_append(&(self), &(other)), \
+            "appending code blocks: %s:%d\n",  \
+            __FILE__, __LINE__);               \
+        (other) = rope_free(other);            \
     } while (0)
 
 /**
  * Gera wrappers para funcoes geradoras de codigo que imprimem
  * uma mensagem em caso de erro
  */
-#define gen_(f, ...)            \
-    (((gen_##f)(__VA_ARGS__)) ? \
-        true:                   \
-        (err(#f "(): %s:%d\n",  \
-            __FILE__, __LINE__), false))
+#define gen_(f, ...)               \
+    assert((gen_##f)(__VA_ARGS__), \
+        #f "(): %s:%d\n",          \
+        __FILE__, __LINE__)
 
 #define gen_jump(  c, l, n)    gen_(jump,   (c), (l), (n))
 #define gen_jz(    c, l, n)    gen_(jz,     (c), (l), (n))
-#define gen_load(  c, i)       gen_(load, (c), (i))
 #define gen_nlbl(  c, l, n)    gen_(nlbl,   (c), (l), (n))
+#define gen_load(  c, i)       gen_(load,   (c), (i))
 #define gen_op(    c, o, t)    gen_(op,     (c), (o), (t))
 #define gen_push(  c, t, a, b) gen_(push,   (c), (t), (a), (b))
 #define gen_pushgp(c)          gen_(pushgp, (c))
@@ -137,15 +136,13 @@ statements : '(' statement ')' { trace(); $$ = $2; }
            ;
 
 statement : ':' TYPE VAR DEFAULT { trace();
-              if ($4.type == TYPE_ERROR
-              || (type_valid($4.type) && !type_compat($2, $4.type)))
-                  err("type: DECL: TYPE = %s, DEFAULT = %s\n",
-                      type2str($2),
-                      type2str($4.type));
+              assert($4.type != TYPE_ERROR
+                  && (!type_valid($4.type) || type_compat($2, $4.type)),
+                  "%s:%s but default value is of type %s\n",
+                  $3, type2str($2), type2str($4.type));
 
               struct var var = { .id = $3, .type = $2, };
-              if (!env_new_var(env, var))
-                  err("creating variable `%s`\n", $3);
+              assert(env_new_var(env, var), "creating variable `%s`\n", $3);
 
               $$ = $4.code;
               if (!rope_is_empty(&$$))
@@ -161,11 +158,11 @@ statement : ':' TYPE VAR DEFAULT { trace();
               enum type t = env_typeof(env, $2);
               unsigned gidx = env_var_gp_idx(env, $2);
 
-              if (v == NULL)
-                  err("Variable not found: `%s`\n", $2);
+              assert(v != NULL, "Variable not found: `%s`\n", $2);
 
-              if (t != TYPE_INT && t != TYPE_FLOAT)
-                  err("type: Expected Int or Float, got %s\n", type2str(t));
+              assert(t == TYPE_INT || t == TYPE_FLOAT,
+                  "type: Expected Int or Float but got %s\n",
+                  type2str(t));
 
               const char * arg = (t == TYPE_INT) ? "1" : "1.0";
 
@@ -177,8 +174,7 @@ statement : ':' TYPE VAR DEFAULT { trace();
           }
           | '=' VAR expression { trace();
               struct var * v = env_var(env, $2);
-              if (v == NULL)
-                  err("Variable not found: `%s`\n", $2);
+              assert(v != NULL, "Variable not found: `%s`\n", $2);
               $$ = $3.code;
               gen_storeg(&$$, env_var_gp_idx(env, $2));
           }
@@ -195,11 +191,11 @@ statement : ':' TYPE VAR DEFAULT { trace();
           | READ VAR { trace();
               $$ = (struct rope) {0};
               struct var * v = env_var(env, $2);
-              if (v == NULL)
-                  err("Variable not found: `%s`\n", $2);
+              assert(v != NULL, "Variable not found: `%s`\n", $2);
 
-              if (v->type != TYPE_INT && v->type != TYPE_FLOAT)
-                  err("`read`: Expected Int or Float, got %s\n", type2str(v->type));
+              assert(v->type == TYPE_INT || v->type == TYPE_FLOAT,
+                  "`read`: Expected Int or Float but got %s\n",
+                  type2str(v->type));
 
               gen_read(&$$);
               gen_aton(&$$, v->type);
@@ -270,12 +266,14 @@ expression_list : arith_op expression expression { trace();
                     $$ = (struct expr) {0};
                     enum type t1 = $2.type;
                     enum type t2 = $3.type;
-                    if (t1 == TYPE_ERROR || t2 == TYPE_ERROR || t1 != t2)
-                        err("`%c`: Types don't match: op1:%s and op2:%s\n",
-                            $1,
-                            type2str(t1),
-                            type2str(t2));
+                    assert(type_valid(t1) && type_valid(t2) && type_compat(t1, t2),
+                        "`%c`: Types don't match: op1:%s and op2:%s\n",
+                        $1, type2str(t1), type2str(t2));
                     $$.type = t1;
+
+                    assert($$.type != TYPE_FLOAT || $1 != '%',
+                        "`%%`: Expected Int, got %s\n",
+                        type2str($$.type));
 
                     $$.code = $2.code;
                     cbapp($$.code, $3.code);
@@ -286,8 +284,7 @@ expression_list : arith_op expression expression { trace();
 expression2 : VAR { trace();
                 $$ = (struct expr) {0};
                 $$.type = env_typeof(env, $1);
-                if (!type_valid($$.type))
-                    err("Variable not found: `%s`\n", $1);
+                assert(type_valid($$.type), "Variable not found: `%s`\n", $1);
 
                 gen_pushgp(&$$.code);
                 gen_load(&$$.code, env_var_gp_idx(env, $1));
@@ -315,8 +312,7 @@ log_op : '&' { trace(); $$ = '&'; }
 expression2_list : '~' expression2 { trace();
                      $$ = (struct expr) {0};
                      enum type t = $2.type;
-                     if (t != TYPE_BOOL)
-                         err("`~`: Expected Bool, got %s\n", type2str(t));
+                     assert(t == TYPE_BOOL, "`~`: Expected Bool, got %s\n", type2str(t));
                      $$.type = t;
 
                      $$.code = $2.code;
@@ -327,11 +323,9 @@ expression2_list : '~' expression2 { trace();
                      $$ = (struct expr) {0};
                      enum type t1 = $2.type;
                      enum type t2 = $3.type;
-                     if (!type_valid(t1) || !type_valid(t2) || !type_compat(t1, t2))
-                         err("`%c`: Types don't match: op1:%s and op2:%s\n",
-                             $1,
-                             type2str(t1),
-                             type2str(t2));
+                     assert(type_valid(t1) && type_valid(t2) && type_compat(t1, t2),
+                         "`%c`: Types don't match: op1:%s and op2:%s\n",
+                         $1, type2str(t1), type2str(t2));
                      $$.type = TYPE_BOOL;
 
                      $$.code = $2.code;
@@ -341,11 +335,9 @@ expression2_list : '~' expression2 { trace();
                  | log_op expression2 expression2 { trace();
                      enum type t1 = $2.type;
                      enum type t2 = $3.type;
-                     if (t1 != TYPE_BOOL || t2 != TYPE_BOOL)
-                         err("`%c`: Expected Bool, got op1:%s and op2:%s\n",
-                             $1,
-                             type2str(t1),
-                             type2str(t2));
+                     assert(t1 == TYPE_BOOL && t2 == TYPE_BOOL,
+                         "`%c`: Expected Bool, got op1:%s and op2:%s\n",
+                         $1, type2str(t1), type2str(t2));
 
                      $$ = $2;
 

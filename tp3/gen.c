@@ -11,7 +11,7 @@ static const char * op2inst_bool (const int op)
         case   '|': return "ADD";
         case   '~': return "NOT";
         case WRITE: return "WRITEI";
-        default:  return NULL;
+        default:    return NULL;
     }
 }
 
@@ -30,7 +30,7 @@ static const char * op2inst_int (const int op)
         case   LEQ: return "INFEQ";
         case   NEQ: return "SUB";
         case WRITE: return "WRITEI";
-        default:  return NULL;
+        default:    return NULL;
     }
 }
 
@@ -49,7 +49,7 @@ static const char * op2inst_float (const int op)
         case   LEQ: return "FINFEQ";
         case   NEQ: return "FSUB";
         case WRITE: return "WRITEF";
-        default:  return NULL;
+        default:    return NULL;
     }
 }
 
@@ -57,7 +57,7 @@ static const char * op2inst_string (const int op)
 {
     switch (op) {
         case WRITE: return "WRITES";
-        default: return NULL;
+        default:    return NULL;
     }
 }
 
@@ -85,6 +85,7 @@ static bool _gen_inst (struct rope * code, const char * inst)
 {
     struct str str = {0};
     return str_cat(&str, inst)
+        && str_shrink_to_fit(&str)
         && rope_push(code, str);
 }
 
@@ -111,6 +112,7 @@ bool gen_jump (struct rope * code, const char * lbl, unsigned num)
     return str_cat(&str, "JUMP ")
         && str_cat(&str, lbl)
         && str_cat(&str, lblnum)
+        && str_shrink_to_fit(&str)
         && rope_push(code, str);
 }
 
@@ -122,6 +124,7 @@ bool gen_jz (struct rope * code, const char * lbl, unsigned num)
     return str_cat(&str, "JZ ")
         && str_cat(&str, lbl)
         && str_cat(&str, lblnum)
+        && str_shrink_to_fit(&str)
         && rope_push(code, str);
 }
 
@@ -132,6 +135,7 @@ bool gen_load (struct rope * code, unsigned gidx)
 
     return str_cat(&str, "LOAD ")
         && str_cat(&str, lblnum)
+        && str_shrink_to_fit(&str)
         && rope_push(code, str);
 }
 
@@ -143,14 +147,13 @@ bool gen_nlbl (struct rope * code, const char * lbl, unsigned num)
     return str_cat(&str, lbl)
         && str_cat(&str, lblnum)
         && str_cat(&str, ":")
+        && str_shrink_to_fit(&str)
         && rope_push(code, str);
 }
 
 bool gen_op (struct rope * code, const int op, enum type type)
 {
-    const char * inst = _type2inst(op, type);
-    return inst != NULL
-        && _gen_inst(code, inst);
+    return _gen_inst(code, _type2inst(op, type));
 }
 
 bool gen_push (struct rope * code, enum type type, const char * arg, bool bv)
@@ -159,18 +162,18 @@ bool gen_push (struct rope * code, enum type type, const char * arg, bool bv)
     char t[3] = "\0 ";
 
     switch (type) {
-        case TYPE_BOOL:   arg = ((bv) ? "1" : "0");
+        case TYPE_BOOL:   arg = ((bv) ? "1" : "0"); /* fallthrough */
         case TYPE_INT:    *t = 'I'; break;
         case TYPE_FLOAT:  *t = 'F'; break;
         case TYPE_STRING: *t = 'S'; break;
         default: return false;
     }
 
-    return (str_cat(&str, "PUSH")
-            && str_cat(&str, t)
-            && str_cat(&str, arg)
-            && rope_push(code, str))
-        || (str_free(str), false);
+    return str_cat(&str, "PUSH")
+        && str_cat(&str, t)
+        && str_cat(&str, arg)
+        && str_shrink_to_fit(&str)
+        && rope_push(code, str);
 }
 
 bool gen_pushgp (struct rope * code)
@@ -190,6 +193,7 @@ bool gen_storeg (struct rope * code, unsigned gidx)
 
     return str_cat(&str, "STOREG ")
         && str_cat(&str, lblnum)
+        && str_shrink_to_fit(&str)
         && rope_push(code, str);
 }
 
