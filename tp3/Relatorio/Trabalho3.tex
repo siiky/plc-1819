@@ -12,7 +12,8 @@
 \usepackage{graphicx} %package para utilizar imagens em latex
 \graphicspath{ {images/} } %folder onde tem as imagens
 \usepackage{wrapfig}
-
+\usepackage{ tipa }
+\usepackage{ textcomp }
 
 %\usepackage{alltt}
 %\usepackage{fancyvrb}
@@ -83,16 +84,16 @@
 \maketitle
 
 \begin{abstract}
-Este relaório debruça-se sobre o desenvolvimento de uma linguagem imperativa que com o auxilio do Yacc\footnote{Yacc - Gerador de Processadores de Linguagens} gera código Assenbly, sendo esse código executável em uma Máquina Virtual(VM)\footnote{Maquina Virtual que mostra o estado das várias stack's ao longo da execução do código gerado pelo Yacc em Assembly} fornecida pela professor desta Unidade Curricular.  
+Este relatório debruça-se sobre o desenvolvimento de uma linguagem imperativa que com o auxilio do Yacc\footnote{Yacc - Gerador de Processadores de Linguagens} gera código Assembly, sendo este executável numa Máquina Virtual(VM)\footnote{Maquina Virtual que mostra o estado das várias stack's ao longo da execução do código gerado pelo Yacc em Assembly} fornecida pelo professor desta Unidade Curricular.  
 \end{abstract}
 
 \tableofcontents
 
 \chapter{Introdução} \label{intro}
-\section{Enquadramento}
-No âmbito da Unidade Curricular Processamento de Linguagens e Compiladores, o projecto proposto consiste na criação de uma Linguagem de Programação Imperativa que permita declarar variáveis atómicas dos tipos Inteiro, Real e Booleano e fazer as operações de atribuição de epressões a variáveis declaradas, leitura (de inteiros ou reais), escrita (de inteiros, reais, booleanos ou strings), condições e ciclos repetir....até 
-e gere código Assembly para a VM fornecida pela professor.
+Este relatório debruça-se sobre o desenvolvimento de uma linguagem imperativa que com o auxilio do Yacc\footnote{Yacc - Gerador de Processadores de Linguagens} gera código Assembly, sendo este executável numa Máquina Virtual(VM)\footnote{Maquina Virtual que mostra o estado das várias stack's ao longo da execução do código gerado pelo Yacc em Assembly} fornecida pelo professor desta Unidade Curricular. 
 
+\section{Enquadramento}
+Um compilador é um programa que transforma um código fonte escrito numa determinada linguagem de alto nível noutra linguagem num nível inferior (mais próximo da linguagem máquina - código binário). Para tal o compilador irá passar pelas fases de análise léxica, sintáctica e semântica até produzir a linguagem final.
 
 \section{Estrutura do Relatório}
 Neste relatório começamos com a Introdução (Capítulo 1) onde, de uma forma breve tentamos descrever o enquadramento do documento e a estrutura do mesmo. \\
@@ -111,42 +112,111 @@ Na próxima secção indicaremos com mais detalhe as ocorrências pretendidas e de q
 
 \section{Especificação dos Requisitos\label{esp}}
 
-
-O Rol de Confessados que nos foi facultado tem um registo por linha.
-Cada campo do registo está separado por "::", sendo que 6 têm o seguinte conteúdo:
-\begin{description}
-\item[1º campo (\$1)] Número do registo;
-\item[2º campo (\$2)] Data do registo;
-\item[3º campo (\$3)] Nome do paroquiano a registar;
-\item[4º campo (\$4)] Pai do paroquiano;
-\item[5º campo (\$5)] Mãe do paroquiano;
-\item[6º campo (\$6)] Informação complementar.
-\end{description} 
-e o último campo apresenta-se sempre vazio.\\\\
-
-Todos os registos têm os primeiros 3 campos preenchidos, podendo os restantes estar omissos.
-Apresentemos o exemplo de um registo completo para facilitar na compreensão do exposto acima e nas seguintes referências a registos do Rol de Confessados.\\
-
-\begin{verbatim}
-598::1722-07-29::Pedro Jose Sousa::Pedro Sousa Falcao::Mariana Sousa Pereira
-::Manuel Felix Sousa,Irmao. Proc.8224.::
-\end{verbatim}
-
-.\\
-\paragraph{Foi-nos proposto sobre o Rol de Confessados fazermos o seguinte processamento:}
+A linguagem a criar deverá permitir declarar Variáveis atómicas dos tipos Inteiro, Real e Booleano e fazer Operações de Atribuição de Expressões a Variáveis declaradas, Leitura (de Inteiros ou Reais), Escrita (de Inteiros, Reais, Booleanos ou Strings), condições e ciclos repetir .. até.
+Após definir a linguagem deveremos a partir de um código fonte com essa linguagem transformar em código Assembly da Máquina Virtual fornecida para o efeito.
 
 
-\subsubsection{Alínea a) - Calcular a frequência de processos por ano}
-Dentro do 2º campo, que representa a data do registo, teremos de verificar em cada registo o ano indicado e calcular o número de vezes que cada ano aparece.
+\chapter{Linguagem Imperativa}
+Neste capítulo explicaremos a linguagem imperativa definida e a sua sintaxe.
 
-\subsubsection{Alínea b) - Calcular a frequência de nomes}
-Dentro dos campos 3, 4 e 5 teremos de verificar todos os nomes apresentados e contabilizá-los para, após todas as linhas serem processadas, apresentarmos o número de ocorrências de cada nome em todas as linhas do rol.
+\section{Tipos}
+Apresentamos os tipos aceites na linguagem criada.\\
 
-\subsubsection{Alínea c) - Calcular a frequência dos vários tipo de relação} 
-Em alguns registos existe informação sobre os tipos de relação existentes com o paroquiano em questão. Essa informação está presente somente no 6º campo pelo que teremos de verificar as ocorrências dessas relações e contabilizar todas para no final apresentarmos o número de ocorrências de cada relação.
+\begin{tabular}{r l l}
+\textbf{Tipo} & \textbf{Descrição} & \textbf{Exemplos} \\
+\hline
+\textbf{Int} & Inteiro & 1 -22 35 \\
+\textbf{Float} & Reais & 1.333 3.0E10 \\
+\textbf{Bool} & Booleano & True False \\
+\end{tabular}
+
+\section{Operadores}
+Os operadores dividem-se em 3 tipos: aritméticos, relacionais e lógicos. De seguida apresentamos os operadores utilizados e a correspondente descrição.
+\\
+
+\begin{tabular}[t]{p{30mm} c c l}
+\textbf{ARITMÉTICOS} & & \textbf{Operador} & \textbf{Descrição} \\  \cline{3-4}
+ &  & \textbf{+} & Soma \\
+ &  & \textbf{-} & Subtração \\
+ &  & \textbf{*} & Multiplicação\\
+ &  & \textbf{/} & Divisão \\
+ &  & \textbf{\%} & Resto da divisão inteira \\
+\end{tabular}
+
+\mbox{}\\
+
+\begin{tabular}[t]{p{30mm} c c l}
+\textbf{RELACIONAIS} & & \textbf{Operador} & \textbf{Descrição}\\ \cline{3-4}
+ &  & \textbf{\textless} & Menor \\
+ &  & \textbf{\textgreater} & Maior \\
+ &  & \textbf{=} & Igual \\
+ &  & \textbf{\textless=} & Menor ou igual \\
+ &  & \textbf{\textgreater=} & Maior ou igual \\
+ &  & \textbf{!=} & Diferente \\
+\end{tabular}
+
+\mbox{}\\
+
+\begin{tabular}[t]{p{30mm} c c l}
+\textbf{LÓGICOS} & & \textbf{Operador} & \textbf{Descrição}\\ \cline{3-4}
+ &  & \textbf{\&} & E lógico \\
+ &  & \textbf{\textpipe} & OU lógico \\
+ &  & \textbf{\texttildelow} & Negação\\
+\end{tabular}
 
 
+\section{Declaração de Variáveis}
+A declaração de variáveis tem a seguinte sintaxe:\\
 
+\fbox{\textbf{(:} tipo var\textbf{)} }\\
+
+Ao declarar, as variáveis são iniciadas com o valor pré-definido do tipo em questão:\\
+ 
+\begin{tabular}{r l}
+\textbf{Tipo} & \textbf{Default} \\
+\hline
+\textbf{Int} & 0\\
+\textbf{Float} & 0.0 \\
+\textbf{Bool} & False \\
+\end{tabular}\\\\
+
+No entanto também é possível definir no momento um \emph{default} diferente iniciando-a com o valor, do tipo da variável, definido. Nestes casos utilizamos a seguinte sintaxe:\\
+
+\fbox{\textbf{(:} tipo var default\textbf{)}}\\
+
+Só é permitido declarar variáveis (\emph{var}) do \emph{tipo} Int, Float e Bool.\\
+
+\section{Atribuições}
+Na atribuição de valores (\emph{valor}) a variáveis (\emph{var}) temos a sintaxe seguinte:\\
+
+\fbox{\textbf{(=} var valor \textbf{)}}\\
+\\
+
+Podemos também incrementar numa unidade o valor da variável (\emph{var}):\\
+
+\fbox{\textbf{(++} var valor\textbf{)}}\\
+
+
+\section{Condições}
+
+\fbox{\textbf{(if} exp \textbf{(}code\_block\textbf{) [ (}else\_code\_block\textbf{) ] )}} \\
+
+\section{Ciclos}
+
+\fbox{\textbf{(until} exp \textbf{(}code\_block\textbf{) )}} \\
+
+\section{Leitura}
+
+\fbox{\textbf{(read} var\textbf{)}}\\
+
+          	  	
+\section{Escrita}
+
+\fbox{\textbf{(write} texto\textbf{)}}\\
+
+\section{Impressão}
+
+\fbox{\textbf{(print} texto\textbf{)}}\\
 
 \chapter{Concepção/desenho da Resolução}
 
