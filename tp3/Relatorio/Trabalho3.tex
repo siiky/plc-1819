@@ -22,11 +22,11 @@
 \lstset{
 	language=C,
 	basicstyle=\small,
-	numbers=left,
+	numbers=none,
 	numberstyle=\tiny,
 	numbersep=5pt,
 	breaklines=true,
-    frame=tB,
+    frame=none,
 	mathescape=true,
 	escapeinside={(*@}{@*)}
 }
@@ -107,12 +107,11 @@ Por último o documento tem o apêndice onde foi introduzido o código fonte do fic
 \chapter{Análise e Especificação}
 \section{Descrição informal do problema}
 
-Este projecto tem como objectivo o aprofundamento de conhecimento do Sistema de Produção\footnote{Sistema baseado num conjunto de regras 'Condição-Acção'.} AWK (uma lingagem de programação para a deteção de padrões e processamento de texto, mais o respetivo interpretador). Para tal, foi-nos proposto construir um ficheiro Gawk\footnote{Gawk - GNU AWK (A palavra AWK é uma abreviatura das iniciais dos sobrenomes dos criadores da linguagem (Aho, Weinberger e Kernighan).} para processar um rol de confessados, com o intuito de calcular o número de certas ocorrências.\\
-Na próxima secção indicaremos com mais detalhe as ocorrências pretendidas e de que forma pretendemos resolver tais problemas.
+Este projecto tem como objectivo o aprofundamento de conhecimento Yacc (um gerador de processadores de linguagens). Para tal, foi-nos proposto construir uma linguagem imperativa e gerar um compilador que transforma a sintaxe da linguagem para "Assembly" reconhecido pela máquina virtual fornecida pelo professor da Unidade Curricular.
 
 \section{Especificação dos Requisitos\label{esp}}
 
-A linguagem a criar deverá permitir declarar Variáveis atómicas dos tipos Inteiro, Real e Booleano e fazer Operações de Atribuição de Expressões a Variáveis declaradas, Leitura (de Inteiros ou Reais), Escrita (de Inteiros, Reais, Booleanos ou Strings), condições e ciclos repetir .. até.
+A linguagem a criar deverá permitir declarar Variáveis atómicas dos tipos Inteiro, Real e Booleano e fazer Operações de Atribuição de Expressões a Variáveis declaradas, Leitura (de Inteiros ou Reais), Escrita (de Inteiros, Reais, Booleanos ou Strings), condições e ciclos repetir...até.
 Após definir a linguagem deveremos a partir de um código fonte com essa linguagem transformar em código Assembly da Máquina Virtual fornecida para o efeito.
 
 
@@ -220,229 +219,427 @@ Podemos também incrementar numa unidade o valor da variável (\emph{var}):\\
 
 \chapter{Concepção/desenho da Resolução}
 
-
-
-
-
-\section{Estruturas de Dados}
-
-Um array associativo é uma estrutura de dados - análoga aos dicionários - composta por um conjunto não ordenado de itens formados por um par chave-valor, em que cada chave possui um valor associado. \\
-O Gawk permite-nos utilizar strings como índices. Assim, optamos pela utilização de arrays associativos para contar a ocorrência de determinadas strings sendo as strings as chaves e o valor o número de ocorrências de cada uma.
-
-\section{Codificação}
-
-\subsubsection{BEGIN}
-Inicialmente especificamos acções a serem executadas antes do processamento da primeira linha utilizando o padrão BEGIN.
-\begin{verbatim}
-BEGIN   {
-            FS="::";
-            IGNORECASE=1
-        }
-\end{verbatim}
-Assim definimos o Field Separator (FS) como "::" \ e a detecção de padrões como Case Insensitive.
-
-\subsubsection{Linhas em Branco}
-Salvaguardamos o facto do ficheiro ter linhas em branco ignorando as mesmas.
-\begin{verbatim}
-/^\s*$/	{ next; } 
-\end{verbatim}
-
-\subsubsection{Alínea a) - Frequência de processos por ano}
-Para calcularmos o número de processos por ano separamos o que está entre '-' no 1º campo e, num array associativo, utilizamos o elemento correspondente ao ano\footnote{Formato do 1º campo: 1778-01-14. Ter em conta que em Awk os índices dos arrays sendo numéricos começam em 1, que é o índice onde será guardado o ano no array data.} como chave. Se a chave já existe apenas incrementa, caso contrário cria a nova chave e incrementa o valor.
-\begin{verbatim}
-		{
-    			split($2, data, /-/);
-    			alA[data[1]]++;
-		}
-\end{verbatim}
-
-\subsubsection{Alínea b) - Frequência de nomes}
-Os nomes que pretendemos vão estar todos entre os campos 3, 4 e 5, que correspondem respectivamente ao paroquiano, o seu pai e a sua mãe. Nos campos indicados estão os nomes completos mas, uma vez que pretendemos contar as ocorrências de cada nome, separamos os vários nomes e apelidos e guardamos num array associativo. Cada nome/apelido será a chave desse array e a cada ocorrência irá incrementar o respectivo valor. Assim, no final do processamento de todas as linhas do texto teremos guardado nesse array todos os nomes/apelidos (chave) e o número de ocorrências de cada um deles (valor).
-
-\begin{verbatim}
-{
-    for (i = 3; i < 6; i++) {
-        # Tirar Expostos/Solteiras/etc
-        gsub(/,.*$/, "", $i);
-
-        split($i, nomes, /\s+/);
-
-        for (nome in nomes)
-            alB[nomes[nome]]++;
-    }
-}
-\end{verbatim}
-
-
-\subsubsection{Alínea c) - Frequência dos tipos de relação}
-Analisando o rol de confessados que nos foi facultado verificamos que dentro do 6º campo temos informação complementar onde, entre outras informações, surgem os tipos de relação. Portanto procuramos correspondências com os padrões dentro do 6º campo de cada linha.
-Verificamos também que cada relação identificada é precedida de uma virgula e termina com o ponto final. Assim, optamos pela procura desse padrão associando a correspondência à chave do array associativo incrementando o seu valor a cada correspondência obtida.
-
-
-\begin{verbatim}
-
-$6 ~ /,\<avo\>([ ]+[mp]atern[oa]s?)?\./        { alC["avo"]++; }
-$6 ~ /,\<irmaos?\>([ ]+[mp]atern[oa]s?)?\./    { alC["irmao"]++; }
-$6 ~ /,\<irmas?\>([ ]+[mp]atern[oa]s?)?\./     { alC["irma"]++; }
-$6 ~ /,\<mae\>\./                              { alC["mae"]++; }
-$6 ~ /,\<madrastas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["madrasta"]++; }
-$6 ~ /,\<padrastos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["padrasto"]++; }
-$6 ~ /,\<madrinhas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["madrinha"]++; }
-$6 ~ /,\<padrinhos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["padrinho"]++; }
-$6 ~ /,\<pai\>\./                              { alC["pai"]++; }
-$6 ~ /,\<primas?\>([ ]+[mp]atern[oa]s?)?\./    { alC["prima"]++; }
-$6 ~ /,\<primos?\>([ ]+[mp]atern[oa]s?)?\./    { alC["primo"]++; }
-$6 ~ /,\<sobrinhas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["sobrinha"]++; }
-$6 ~ /,\<sobrinhos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["sobrinho"]++; }
-$6 ~ /,\<tias?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tia"]++; }
-$6 ~ /,\<tios?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tio"]++; }
-\end{verbatim}
-
-\subsubsection{Funções}
-Definimos 3 funções que irão escrever o conteúdo de cada um dos arrays associativos - cada um no seu ficheiro - de forma formatada e com uma descrição na primeira linha de cada um.
-\begin{verbatim}
-function alineaA (outf)
-{
-    printf "Frequência de processos por ano:\n" > outf;
-    for (ano in alA)
-        printf("%s\t%s\n", ano, alA[ano]) >> outf;
-}
-
-function alineaB (outf)
-{
-    printf "Frequência de nomes:\n" > outf;
-    for (nome in alB)
-        printf("%s\t%s\n", nome, alB[nome]) >> outf;
-}
-
-function alineaC (outf)
-{
-    printf "Frequência dos vários tipos de relação:\n" > outf;
-    for (parentesco in alC)
-        printf("%s\t%s\n", parentesco, alC[parentesco]) >> outf;
-}
-\end{verbatim}
- 
- 
-\subsubsection{END}
-
-Para finalizar utilizamos o END para executarmos as funções acima definidas após todas as linhas terem sido executadas. 
-
-\begin{verbatim}
-END     {
-          alineaA("anos.txt");
-          alineaB("nomes.txt");
-          alineaC("parentescos.txt");
-        }	
-\end{verbatim}
-Criando assim os 3 ficheiros com extensão txt que irão armazenar os resultados pedidos para cada uma das alíneas.
-
 \chapter{Testes}
 \section{Testes realizados e Resultados}
 
-Devido ao facto do rol de confessados ter bastante informação para ser processada ($\approx 37000\ linhas$), o grupo decidiu para efeitos de apresentação de testes e resultados desse processamento, apresentar neste relatório uma porção do rol de confessados representativa da informação contida nesse rol.\\
-Ao processar o rol de confessados verificamos que existem algumas variações na apresentação da informação, isto é, existem registos (linhas do rol de confessados) em que os campos não estavam todos preenchidos, mais especificamente o campo 6. E por vezes, como foi referido na secção \ref{esp}, esse campo contém informação complementar incluindo tipo de relação.\\
-Abaixo encontra-se porção supra referida do rol de processos, onde cada linha representa um registo desse rol e contém os campos referidos na secção \ref{esp}.
-\\
+Para efeitos de teste preparamos vários ficheiros que cada um contém desde declarações, a atribuições, condições, ciclos, etc...\\
+Estes testes serão organizados em tabeas abaixo apresentadas com a primeira coluna a representar o código-fonte de acordo com a nossa linguagem imperativa criada e a segunda coluna o código em "assembly" em conformidada com a máquina virtual fornecida.
+\subsection{Declarações e Atribuições}
+\begin{tabular}{ | c |c|}
+\hline
+Input & Output \\
+\hline
+\lstinputlisting{../examples/atribs.z}
+ & \lstinputlisting{../examples/atribs.vm} \\
+ \hline
+\end{tabular}
+
+\subsection{Operadores Aritméticos}
+\begin{tabular}{| c |c|}
+\hline
+Input & Output \\
+\hline
+
+\lstinputlisting{../examples/arith.z}
+& \lstinputlisting{../examples/arith.vm} \\
+\hline
+\end{tabular}
+
+\subsection{Leitura}
+\begin{tabular}{| c |c|}
+\hline
+Input & Output \\
+\hline
+\lstinputlisting{../examples/read_float.z}
+ & \lstinputlisting{../examples/read_float.vm}\\
+\hline
+\end{tabular}
 
 
-%\lstinputlisting{../teste1.txt} %input de um ficheiro
+\subsection{Condição IF}
+\begin{tabular}{| c |c|}
+\hline
+Input & Output \\
+\hline
+\lstinputlisting{../examples/if.z}
+ & \lstinputlisting{../examples/if.vm}\\
+\hline
+\end{tabular}
 
-\subsubsection{Alínea a) - Frequência de processos por ano}
-De seguida apresentamos o ficheiro \emph{anos.txt} com o resultado da frequência de processos por ano:\\
-
-%\lstinputlisting{../anos.txt} %input de um ficheiro
-
-\subsubsection{Alínea b) - Frequência de nomes}
-De seguida apresentamos o ficheiro \emph{nomes.txt} com o resultado da frequência de nomes:\\
-%\lstinputlisting{../nomes.txt} %input de um ficheiro
-
-\subsubsection{Alínea c) - Frequência dos tipos de relação}
-De seguida apresentamos o ficheiro \emph{parentescos.txt} com o resultado da frequência de vários tipos de relação:\\
-%\lstinputlisting{../parentescos.txt} %input de um ficheiro
-
-
+\subsection{Ciclo Repetir..Até }
+\begin{tabular}{| c |c|}
+\hline
+Input & Output \\
+\hline
+\lstinputlisting{../examples/until.z}
+ & \lstinputlisting{../examples/until.vm}\\
+\hline
+\end{tabular}
 
 \chapter{Conclusão} \label{concl}
-
-Este projecto mostrou-nos que o Gawk permite-nos programar filtros de texto e relatórios sobre informação de forma muito acessível, principalmente quando existe muito informação para ser processada.\\
+Este projecto mostrou-nos que tendo já desenvolvido a gramática de uma linguagem imperativa, podemos criar um compilador através do Yacc que usando a estrutura 'Produção-Ação', isto é, para cada instrução do código fonte que satisfaça alguma produção da linguagem imperativa tem como ação a criação do código "assembly", o que consequentemente, deu-nos uma visão mais detalhada sobre como um compilador funciona.
 Este projeto está finalizado para o que nos foi proposto.
-Se no futuro houver necessidade de uma filtragem/processamento mais específico apenas teremos de fazer pequenas alterações ou incluir novos padrões baseando-nos na mesma estrutura 'Padrão-Acção' e usando a mesma estrutura de dados (arrays associativos).
 
 \appendix
 \chapter{Código do Programa}
 
-Lista-se a seguir o código Awk do programa  que foi desenvolvido.
+
+Lista-se a seguir o código Yacc do programa que foi desenvolvido.
 \begin{verbatim}
-BEGIN {
-    FS="::";
-    IGNORECASE=1
+%{
+#include <stdbool.h>
+#include <stdio.h>
+
+#include "env.h"
+#include "gen.h"
+#include "str.h"
+#include "rope.h"
+
+#include "lex.yy.h"
+
+int yyerror (const char *s);
+
+/**
+ * Verifica se uma condicao e verdadeira e, caso nao seja,
+ * imprime uma mensagem de erro e aborta o programa
+ */
+#define assert(cond, ...)                       \
+    if (!(cond)) do {                           \
+        fprintf(stderr, "ERROR: " __VA_ARGS__); \
+        return 1;                               \
+    } while (0)
+
+/** Se activado, mostra as producoes por onde passa */
+#ifdef TRACE
+#define trace(...) ((void) fprintf(stderr, "TRACE: %s:%d\n", __FILE__, __LINE__))
+#else
+#define trace(...) ((void) 0)
+#endif /* TRACE */
+
+#define type_valid(t)       ((t) > TYPE_ERROR && (t) < TYPE_DEFAULT)
+#define type_compat(t1, t2) ((t1) == (t2))
+
+/**
+ * Concatena dois blocos de codigo, @a self e @a other, e imprime
+ * uma mensagem em caso de erro
+ */
+#define cbapp(self, other) do {                \
+        assert(rope_append(&(self), &(other)), \
+            "appending code blocks: %s:%d\n",  \
+            __FILE__, __LINE__);               \
+        (other) = rope_free(other);            \
+    } while (0)
+
+/**
+ * Gera wrappers para funcoes geradoras de codigo que imprimem
+ * uma mensagem em caso de erro
+ */
+#define gen_(f, ...)               \
+    assert((gen_##f)(__VA_ARGS__), \
+        #f "(): %s:%d\n",          \
+        __FILE__, __LINE__)
+
+#define gen_jump(  c, l, n)    gen_(jump,   (c), (l), (n))
+#define gen_jz(    c, l, n)    gen_(jz,     (c), (l), (n))
+#define gen_nlbl(  c, l, n)    gen_(nlbl,   (c), (l), (n))
+#define gen_load(  c, i)       gen_(load,   (c), (i))
+#define gen_op(    c, o, t)    gen_(op,     (c), (o), (t))
+#define gen_push(  c, t, a, b) gen_(push,   (c), (t), (a), (b))
+#define gen_pushgp(c)          gen_(pushgp, (c))
+#define gen_storeg(c, i)       gen_(storeg, (c), (i))
+
+static struct rope _var_decs = {0};
+static struct rope * const var_decs = &_var_decs;
+
+%}
+
+%union {
+    struct expr {
+        enum type   type;
+        struct rope code;
+    }           valExpr;
+
+    bool        valBool;
+    char *      valString;
+    enum type   valType;
+    float       valFloat;
+    int         valInt;
+    struct rope valCode;
 }
 
-/^\s*$/ { next; }
+%token INC
+%token GEQ
+%token IF
+%token LEQ
+%token NEQ
+%token PRINT
+%token READ
+%token UNTIL
+%token WRITE
 
-{ # Alinea (a)
-    split($2, data, /-/);
-    alA[data[1]]++;
-}
+%token <valBool>  BOOL_VALUE
+%token <valFloat> FLOAT_VALUE
+%token <valInt>   INT_VALUE
+%token <valString>STR
+%token <valString>VAR
+%token <valType>  TYPE
 
-{ # Alinea (b)
-    for (i = 3; i < 6; i++) {
-        # Tirar Expostos/Solteiras/etc
-        gsub(/,.*$/, "", $i);
+%type <valCode>code_block
+%type <valCode>else_clause
+%type <valCode>statement
+%type <valCode>statements
 
-        split($i, nomes, /\s+/);
+%type <valExpr>DEFAULT
+%type <valExpr>expression
+%type <valExpr>expression2
+%type <valExpr>expression2_list
+%type <valExpr>expression_list
+%type <valExpr>writable
 
-        for (nome in nomes)
-            alB[nomes[nome]]++;
-    }
-}
+%type <valInt>arith_op
+%type <valInt>log_op
+%type <valInt>num_op
 
-# Alinea (c)
-$6 ~ /,\<avo\>([ ]+[mp]atern[oa]s?)?\./        { alC["avo"]++; }
-$6 ~ /,\<irmaos?\>\./                          { alC["irmao"]++; }
-$6 ~ /,\<irmas?\>\./                           { alC["irma"]++; }
-$6 ~ /,\<mae\>\./                              { alC["mae"]++; }
-$6 ~ /,\<madrastas?\>\./                       { alC["madrasta"]++; }
-$6 ~ /,\<padrastos?\>\./                       { alC["padrasto"]++; }
-$6 ~ /,\<madrinhas?\>\./                       { alC["madrinha"]++; }
-$6 ~ /,\<padrinhos?\>\./                       { alC["padrinho"]++; }
-$6 ~ /,\<pai\>\./                              { alC["pai"]++; }
-$6 ~ /,\<primas?\>([ ]+[mp]atern[oa]s?)?\./    { alC["prima"]++; }
-$6 ~ /,\<primos?\>([ ]+[mp]atern[oa]s?)?\./    { alC["primo"]++; }
-$6 ~ /,\<sobrinhas?\>([ ]+[mp]atern[oa]s?)?\./ { alC["sobrinha"]++; }
-$6 ~ /,\<sobrinhos?\>([ ]+[mp]atern[oa]s?)?\./ { alC["sobrinho"]++; }
-$6 ~ /,\<tias?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tia"]++; }
-$6 ~ /,\<tios?\>([ ]+[mp]atern[oa]s?)?\./      { alC["tio"]++; }
+%type <valType>VALUE
 
-function alineaA (outf)
+%%
+
+programa : code_block { trace();
+             rope_fprint(var_decs, yyout);
+             fputs("START\n", yyout);
+             rope_fprint(&$1, yyout);
+             fputs("STOP\n", yyout);
+             $1 = rope_free($1);
+         }
+         ;
+
+code_block : statements            { trace(); $$ = $1; }
+           | statements code_block { trace();
+               $$ = $1;
+               cbapp($$, $2);
+           }
+           ;
+
+statements : '(' statement ')' { trace(); $$ = $2; }
+           ;
+
+statement : ':' TYPE VAR DEFAULT { trace();
+              assert($4.type != TYPE_ERROR
+                  && (!type_valid($4.type) || type_compat($2, $4.type)),
+                  "%s:%s but default value is of type %s\n",
+                  $3, type2str($2), type2str($4.type));
+
+              struct var var = { .id = $3, .type = $2, };
+              assert(env_new_var(env, var), "creating variable `%s`\n", $3);
+
+              $$ = $4.code;
+              if (!rope_is_empty(&$$))
+                  gen_storeg(&$$, env_var_gp_idx(env, $3));
+
+              gen_push(var_decs, $2,
+                  (($2 == TYPE_FLOAT) ? "0.0" : "0"),
+                  yylval.valBool);
+          }
+          | INC VAR { trace();
+              $$ = (struct rope) {0};
+              struct var * v = env_var(env, $2);
+              enum type t = env_typeof(env, $2);
+              unsigned gidx = env_var_gp_idx(env, $2);
+
+              assert(v != NULL, "Variable not found: `%s`\n", $2);
+
+              assert(t == TYPE_INT || t == TYPE_FLOAT,
+                  "type: Expected Int or Float but got %s\n",
+                  type2str(t));
+
+              const char * arg = (t == TYPE_INT) ? "1" : "1.0";
+
+              gen_pushgp(&$$);
+              gen_load(&$$, gidx);
+              gen_push(&$$, t, arg, false);
+              gen_op(&$$, '+', t);
+              gen_storeg(&$$, gidx);
+          }
+          | '=' VAR expression { trace();
+              struct var * v = env_var(env, $2);
+              assert(v != NULL, "Variable not found: `%s`\n", $2);
+              $$ = $3.code;
+              gen_storeg(&$$, env_var_gp_idx(env, $2));
+          }
+          | WRITE writable { trace();
+              $$ = $2.code;
+              gen_op(&$$, WRITE, $2.type);
+          }
+          | PRINT writable { trace();
+              $$ = $2.code;
+              gen_op(&$$, WRITE, $2.type);
+              gen_push(&$$, TYPE_STRING, "\"\\n\"", false);
+              gen_op(&$$, WRITE, TYPE_STRING);
+          }
+          | READ VAR { trace();
+              $$ = (struct rope) {0};
+              struct var * v = env_var(env, $2);
+              assert(v != NULL, "Variable not found: `%s`\n", $2);
+
+              assert(v->type == TYPE_INT || v->type == TYPE_FLOAT,
+                  "`read`: Expected Int or Float but got %s\n",
+                  type2str(v->type));
+
+              gen_read(&$$);
+              gen_aton(&$$, v->type);
+              gen_storeg(&$$, env_var_gp_idx(env, $2));
+          }
+          | IF expression2 '(' code_block ')' else_clause { trace();
+              unsigned num = gen_ifno();
+
+              $$ = $2.code;
+              gen_jz(&$$, "ELSE", num);    /* jump to else label? */
+              cbapp($$, $4);               /* then block */
+              gen_jump(&$$, "ENDIF", num); /* jump to endif label */
+              gen_nlbl(&$$, "ELSE", num);  /* else label */
+              cbapp($$, $6);               /* else block (possibly empty) */
+              gen_nlbl(&$$, "ENDIF", num); /* endif label */
+          }
+          | UNTIL expression2 '(' code_block ')' { trace();
+              $$ = (struct rope) {0};
+              unsigned num = gen_untilno();
+
+              gen_nlbl(&$$, "UNTIL", num); /* until label */
+              cbapp($$, $4);               /* loop body block */
+              cbapp($$, $2.code);          /* condition */
+              gen_jz(&$$, "UNTIL", num);   /* jump to until label? */
+          }
+          ;
+
+writable : expression { trace(); $$ = $1; }
+         | STR        { trace();
+             $$ = (struct expr) {0};
+             $$.type = TYPE_STRING;
+             gen_push(&$$.code, TYPE_STRING, yytext, false);
+         }
+         ;
+
+DEFAULT : { trace();
+            $$ = (struct expr) {0};
+            $$.type = TYPE_DEFAULT;
+        }
+        | expression { trace(); $$ = $1; }
+        ;
+
+else_clause :                    { trace(); $$ = (struct rope) {0}; }
+            | '(' code_block ')' { trace(); $$ = $2; }
+            ;
+
+expression : VALUE { trace();
+               $$ = (struct expr) {0};
+               $$.type = $1;
+               gen_push(&$$.code, $1, yytext, false);
+           }
+           | expression2             { trace(); $$ = $1; }
+           | '(' expression_list ')' { trace(); $$ = $2; }
+           ;
+
+VALUE : INT_VALUE   { trace(); $$ = TYPE_INT;   }
+      | FLOAT_VALUE { trace(); $$ = TYPE_FLOAT; }
+      ;
+
+arith_op : '+' { trace(); $$ = '+'; }
+         | '*' { trace(); $$ = '*'; }
+         | '-' { trace(); $$ = '-'; }
+         | '/' { trace(); $$ = '/'; }
+         | '%' { trace(); $$ = '%'; }
+         ;
+
+expression_list : arith_op expression expression { trace();
+                    $$ = (struct expr) {0};
+                    enum type t1 = $2.type;
+                    enum type t2 = $3.type;
+                    assert(type_valid(t1) && type_valid(t2) && type_compat(t1, t2),
+                        "`%c`: Types don't match: op1:%s and op2:%s\n",
+                        $1, type2str(t1), type2str(t2));
+                    $$.type = t1;
+
+                    assert($$.type != TYPE_FLOAT || $1 != '%',
+                        "`%%`: Expected Int, got %s\n",
+                        type2str($$.type));
+
+                    $$.code = $2.code;
+                    cbapp($$.code, $3.code);
+                    gen_op(&$$.code, $1, t1);
+                }
+                ;
+
+expression2 : VAR { trace();
+                $$ = (struct expr) {0};
+                $$.type = env_typeof(env, $1);
+                assert(type_valid($$.type), "Variable not found: `%s`\n", $1);
+
+                gen_pushgp(&$$.code);
+                gen_load(&$$.code, env_var_gp_idx(env, $1));
+            }
+            | BOOL_VALUE { trace();
+                $$ = (struct expr) {0};
+                $$.type = TYPE_BOOL;
+                gen_push(&$$.code, TYPE_BOOL, NULL, yylval.valBool);
+            }
+            | '(' expression2_list ')' { trace(); $$ = $2; }
+            ;
+
+num_op : '<' { trace(); $$ = '<'; }
+       | '=' { trace(); $$ = '='; }
+       | '>' { trace(); $$ = '>'; }
+       | GEQ { trace(); $$ = GEQ; }
+       | LEQ { trace(); $$ = LEQ; }
+       | NEQ { trace(); $$ = NEQ; }
+       ;
+
+log_op : '&' { trace(); $$ = '&'; }
+       | '|' { trace(); $$ = '|'; }
+       ;
+
+expression2_list : '~' expression2 { trace();
+                     $$ = (struct expr) {0};
+                     enum type t = $2.type;
+                     assert(t == TYPE_BOOL, "`~`: Expected Bool, got %s\n", type2str(t));
+                     $$.type = t;
+
+                     $$.code = $2.code;
+
+                     gen_op(&$$.code, '~', $2.type);
+                 }
+                 | num_op expression expression { trace();
+                     $$ = (struct expr) {0};
+                     enum type t1 = $2.type;
+                     enum type t2 = $3.type;
+                     assert(type_valid(t1) && type_valid(t2) && type_compat(t1, t2),
+                         "`%c`: Types don't match: op1:%s and op2:%s\n",
+                         $1, type2str(t1), type2str(t2));
+                     $$.type = TYPE_BOOL;
+
+                     $$.code = $2.code;
+                     cbapp($$.code, $3.code);
+                     gen_op(&$$.code, $1, t1);
+                 }
+                 | log_op expression2 expression2 { trace();
+                     enum type t1 = $2.type;
+                     enum type t2 = $3.type;
+                     assert(t1 == TYPE_BOOL && t2 == TYPE_BOOL,
+                         "`%c`: Expected Bool, got op1:%s and op2:%s\n",
+                         $1, type2str(t1), type2str(t2));
+
+                     $$ = $2;
+
+                     cbapp($$.code, $3.code);
+                     gen_op(&$$.code, $1, t1);
+                 }
+                 ;
+
+%%
+
+int yyerror (const char *s)
 {
-    printf "Frequencia de processos por ano:\n" > outf;
-    for (ano in alA)
-        printf("%s\t%s\n", ano, alA[ano]) >> outf;
+  return fprintf(stderr, "ERRO: '%s'\n", s);
 }
-
-function alineaB (outf)
-{
-    printf "Frequencia de nomes:\n" > outf;
-    for (nome in alB)
-        printf("%s\t%s\n", nome, alB[nome]) >> outf;
-}
-
-function alineaC (outf)
-{
-    printf "Frequencia dos varios tipos de relacao:\n" > outf;
-    for (parentesco in alC)
-        printf("%s\t%s\n", parentesco, alC[parentesco]) >> outf;
-}
-
-END {
-    alineaA("anos.txt");
-    alineaB("nomes.txt");
-    alineaC("parentescos.txt");
-}
-
 \end{verbatim}
-
 
 \end{document} 

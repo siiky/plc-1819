@@ -1,2 +1,7 @@
 (: Int x)
 (: Int y 2)
+(= x (+ x y))
+(: Bool a)
+(: Bool b True)
+(: Float z 10.0)
+(: Float t)
