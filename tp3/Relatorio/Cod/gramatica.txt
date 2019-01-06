@@ -1,0 +1,59 @@
+
+programa 	 : code_block 		
+         	 ;
+code_block 	 : statements            
+           	 | statements code_block 
+           	 ;
+statements 	 : '(' statement ')' 
+           	 ;
+statement 	 : ':' TYPE VAR DEFAULT 
+		 | INC VAR 			
+		 | '=' VAR expression  
+   		 | WRITE writable 		
+    		 | PRINT writable 		
+    		 | READ VAR 			
+    		 | IF expression2 '(' code_block ')' else_clause 
+          	 | UNTIL expression2 '(' code_block ')' 		
+        	 ;
+writable	 : expression 
+        	 | STR        
+        	 ;
+DEFAULT 	 : 
+        	 | expression 
+       	 	 ;
+else_clause	 :                    
+             	 | '(' code_block ')' 
+           	 ;
+expression	 : VALUE 
+       		 | expression2            
+       	 	 | '(' expression_list ')' 
+       	 	 ;
+VALUE 		 : INT_VALUE   
+      		 | FLOAT_VALUE 
+        	 ;
+arith_op	 : '+' 
+       		 | '*' 
+       	   	 | '-'
+          	 | '/' 
+           	 | '%' 
+         	 ;
+expression_list  : arith_op expression expression
+                 ;
+expression2 	 : VAR 		
+            	 | BOOL_VALUE 
+            	 | '(' expression2_list ')' 
+            	 ;
+num_op 	  	 : '<' 
+      	 	 | '=' 
+       	 	 | '>' 
+      	 	 | GEQ
+       	 	 | LEQ 
+       	 	 | NEQ 
+      	  	 ;
+log_op 		 : '&' 
+       		 | '|' 
+       	  	 ;
+expression2_list : '~' expression2 
+                 | num_op expression expression 
+                 | log_op expression2 expression2
+                 ;

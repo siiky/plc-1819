@@ -12,13 +12,16 @@
 \usepackage{graphicx} %package para utilizar imagens em latex
 \graphicspath{ {images/} } %folder onde tem as imagens
 \usepackage{wrapfig}
+\usepackage{verbatim}
 \usepackage{ tipa }
 \usepackage{ textcomp }
+
 
 %\usepackage{alltt}
 %\usepackage{fancyvrb}
 \usepackage{listings}
 %LISTING - GENERAL
+
 \lstset{
 	language=C,
 	basicstyle=\small,
@@ -84,16 +87,17 @@
 \maketitle
 
 \begin{abstract}
-Este relatório debruça-se sobre o desenvolvimento de uma linguagem imperativa que com o auxilio do Yacc\footnote{Yacc - Gerador de Processadores de Linguagens} gera código Assembly, sendo este executável numa Máquina Virtual(VM)\footnote{Maquina Virtual que mostra o estado das várias stack's ao longo da execução do código gerado pelo Yacc em Assembly} fornecida pelo professor desta Unidade Curricular.  
+Este relatório debruça-se sobre o desenvolvimento de uma linguagem imperativa que com o auxilio do Yacc\footnote{Yacc - Gerador de Processadores de Linguagens} gera código Assembly, sendo esse código executável em uma Máquina Virtual(VM)\footnote{Maquina Virtual que mostra o estado das várias stack's ao longo da execução do código gerado pelo Yacc em Assembly} fornecida pelo professor desta Unidade Curricular.
 \end{abstract}
 
 \tableofcontents
 
 \chapter{Introdução} \label{intro}
-Este relatório debruça-se sobre o desenvolvimento de uma linguagem imperativa que com o auxilio do Yacc\footnote{Yacc - Gerador de Processadores de Linguagens} gera código Assembly, sendo este executável numa Máquina Virtual(VM)\footnote{Maquina Virtual que mostra o estado das várias stack's ao longo da execução do código gerado pelo Yacc em Assembly} fornecida pelo professor desta Unidade Curricular. 
-
+Este relaório debruça-se sobre o desenvolvimento de uma linguagem imperativa que com o auxilio do Yacc\footnote{Yacc - Gerador de Processadores de Linguagens} gera código Assenbly, sendo esse código executável em uma Máquina Virtual(VM)\footnote{Maquina Virtual que mostra o estado das várias stack's ao longo da execução do código gerado pelo Yacc em Assembly} fornecida pela professor desta Unidade Curricular. 
 \section{Enquadramento}
-Um compilador é um programa que transforma um código fonte escrito numa determinada linguagem de alto nível noutra linguagem num nível inferior (mais próximo da linguagem máquina - código binário). Para tal o compilador irá passar pelas fases de análise léxica, sintáctica e semântica até produzir a linguagem final.
+No âmbito da Unidade Curricular Processamento de Linguagens e Compiladores, o projecto proposto consiste na criação de uma Linguagem de Programação Imperativa que permita declarar variáveis atómicas dos tipos Inteiro, Real e Booleano e fazer as operações de atribuição de epressões a variáveis declaradas, leitura (de inteiros ou reais), escrita (de inteiros, reais, booleanos ou strings), condições e ciclos repetir....até 
+e gere código Assembly para a VM fornecida pela professor.
+
 
 \section{Estrutura do Relatório}
 Neste relatório começamos com a Introdução (Capítulo 1) onde, de uma forma breve tentamos descrever o enquadramento do documento e a estrutura do mesmo. \\
@@ -107,16 +111,21 @@ Por último o documento tem o apêndice onde foi introduzido o código fonte do fic
 \chapter{Análise e Especificação}
 \section{Descrição informal do problema}
 
+
 Este projecto tem como objectivo o aprofundamento de conhecimento Yacc (um gerador de processadores de linguagens). Para tal, foi-nos proposto construir uma linguagem imperativa e gerar um compilador que transforma a sintaxe da linguagem para "Assembly" reconhecido pela máquina virtual fornecida pelo professor da Unidade Curricular.
 
 \section{Especificação dos Requisitos\label{esp}}
 
-A linguagem a criar deverá permitir declarar Variáveis atómicas dos tipos Inteiro, Real e Booleano e fazer Operações de Atribuição de Expressões a Variáveis declaradas, Leitura (de Inteiros ou Reais), Escrita (de Inteiros, Reais, Booleanos ou Strings), condições e ciclos repetir...até.
+
+A linguagem a criar deverá permitir declarar Variáveis atómicas dos tipos Inteiro, Real e Booleano e fazer Operações de Atribuição de Expressões a Variáveis declaradas, Leitura (de Inteiros ou Reais), Escrita (de Inteiros, Reais, Booleanos ou Strings), condições e ciclos repetir .. até.
 Após definir a linguagem deveremos a partir de um código fonte com essa linguagem transformar em código Assembly da Máquina Virtual fornecida para o efeito.
 
 
 \chapter{Linguagem Imperativa}
 Neste capítulo explicaremos a linguagem imperativa definida e a sua sintaxe.
+
+\section{Variáveis}
+As variáveis terão de começar obrigatoriamente por uma letra ou underscore, podendo ser seguida de números, letras ou underscores. A título de exemplo, as variáveis \emph{\_aluno}, \emph{Aluno22}, \emph{aluno} e \emph{aluNo} são válidas.
 
 \section{Tipos}
 Apresentamos os tipos aceites na linguagem criada.\\
@@ -186,38 +195,67 @@ No entanto também é possível definir no momento um \emph{default} diferente inic
 Só é permitido declarar variáveis (\emph{var}) do \emph{tipo} Int, Float e Bool.\\
 
 \section{Atribuições}
-Na atribuição de valores (\emph{valor}) a variáveis (\emph{var}) temos a sintaxe seguinte:\\
+Na atribuição a variáveis (\emph{var}) temos a sintaxe seguinte:\\
 
-\fbox{\textbf{(=} var valor \textbf{)}}\\
+\fbox{\textbf{(=} var exp \textbf{)}}\\
 \\
+Em que \emph{exp} pode ser um valor Int, Float, Bool, uma variável ou uma operação aritmética.\\
 
-Podemos também incrementar numa unidade o valor da variável (\emph{var}):\\
+Podemos também incrementar numa unidade o valor da variável (\emph{var}), que apenas é válido para variáveis do tipo Int e Float:\\
 
-\fbox{\textbf{(++} var valor\textbf{)}}\\
+\fbox{\textbf{(++} var\textbf{)}}\\
 
 
-\section{Condições}
+
+\section{Condição If}
+
+As condições \emph{if then else} terão a seguinte sintaxe:\\
 
 \fbox{\textbf{(if} exp \textbf{(}code\_block\textbf{) [ (}else\_code\_block\textbf{) ] )}} \\
 
+Em que \emph{exp} terá expressões com valor lógico que corresponderá à condição necessária para executar a porção de código \emph{code\_block}, caso contrário, se definido, será executada a porção de código \emph{else\_code\_block}.
+
 \section{Ciclos}
+
+Os ciclos executam uma determinada porção de código \emph{code\_block} até a condição \emph{exp} ser verdadeira. Nesse sentido, \emph{exp} será uma expressão com valor lógico. Cada ciclo terá então a seguinte sintaxe:\\
 
 \fbox{\textbf{(until} exp \textbf{(}code\_block\textbf{) )}} \\
 
 \section{Leitura}
+
+A leitura será feita do stdin e irá guardar na variável \emph{var} que será do tipo Int ou Float. \\
+A sintaxe será:\\
 
 \fbox{\textbf{(read} var\textbf{)}}\\
 
           	  	
 \section{Escrita}
 
-\fbox{\textbf{(write} texto\textbf{)}}\\
+A escrita será feita após receber um Int, Float, Bool ou String seguindo a seguinte sintaxe:\\
+
+\fbox{\textbf{(write} exp\textbf{)}}\\
 
 \section{Impressão}
 
+A impressão utiliza a seguinte sintaxe imprimindo o argumento que lhe é passado: \\
+
 \fbox{\textbf{(print} texto\textbf{)}}\\
 
+\chapter{Gramática}
+
+Seguindo a definição da linguagem descrita no Capítulo 3 criamos a seguinte gramática que será a base do nosso projecto. A partir dela, posteriormente, aplicaremos as respectivas ações semânticas como veremos a seguir.\\ 
+\lstinputlisting{./Cod/gramatica.txt}	
+
+
 \chapter{Concepção/desenho da Resolução}
+Neste capítulo iremos descrever a concepção/desenho do analisador sintático iniciando cada ação semântica com um pequeno resumo seguido do código referido.
+
+
+
+
+
+
+
 
 \chapter{Testes}
 \section{Testes realizados e Resultados}
@@ -276,13 +314,15 @@ Input & Output \\
 \hline
 \end{tabular}
 
+
+   
 \chapter{Conclusão} \label{concl}
+
 Este projecto mostrou-nos que tendo já desenvolvido a gramática de uma linguagem imperativa, podemos criar um compilador através do Yacc que usando a estrutura 'Produção-Ação', isto é, para cada instrução do código fonte que satisfaça alguma produção da linguagem imperativa tem como ação a criação do código "assembly", o que consequentemente, deu-nos uma visão mais detalhada sobre como um compilador funciona.
 Este projeto está finalizado para o que nos foi proposto.
 
 \appendix
 \chapter{Código do Programa}
-
 
 Lista-se a seguir o código Yacc do programa que foi desenvolvido.
 \begin{verbatim}
