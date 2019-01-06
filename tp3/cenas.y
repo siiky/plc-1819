@@ -122,6 +122,7 @@ programa : code_block { trace();
              rope_fprint(&$1, yyout);
              fputs("STOP\n", yyout);
              $1 = rope_free($1);
+             _var_decs = rope_free(_var_decs);
          }
          ;
 
@@ -136,8 +137,8 @@ statements : '(' statement ')' { trace(); $$ = $2; }
            ;
 
 statement : ':' TYPE VAR DEFAULT { trace();
-              assert($4.type != TYPE_ERROR
-                  && (!type_valid($4.type) || type_compat($2, $4.type)),
+              assert($4.type == TYPE_DEFAULT
+                  || (type_valid($4.type) && type_compat($2, $4.type)),
                   "%s:%s but default value is of type %s\n",
                   $3, type2str($2), type2str($4.type));
 
@@ -175,6 +176,10 @@ statement : ':' TYPE VAR DEFAULT { trace();
           | '=' VAR expression { trace();
               struct var * v = env_var(env, $2);
               assert(v != NULL, "Variable not found: `%s`\n", $2);
+              assert(type_compat(v->type, $3.type),
+                  "Types don't match: Expected %s but got %s\n",
+                  type2str(v->type),
+                  type2str($3.type));
               $$ = $3.code;
               gen_storeg(&$$, env_var_gp_idx(env, $2));
           }
