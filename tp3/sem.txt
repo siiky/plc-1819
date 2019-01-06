@@ -1,0 +1,191 @@
+programa : code_block {
+    Nesta producao sao impressas as declaracoes de variaveis globais,
+    a instrucao START para iniciar o programa, o codigo do programa em si e,
+    finalmente, a instrucao STOP que marca o fim do programa.
+    O codigo da declaracao das variaveis globais e o codigo do
+    programa em si sao guardados num vector de strings cada, e sao
+    percorridos uma vez no fim do programa, quando o parser consegue
+    reconhecer o nao terminal code_block.
+    }
+    ;
+
+code_block : statements {
+    O codigo do bloco de codigo e o codigo de um statement.
+    }
+    | statements code_block {
+    O codigo do bloco de codigo e o resultado de concatenar o
+    codigo de um statement com o codigo do resto do block.
+    }
+    ;
+
+statements : '(' statement ')' {
+    O codigo de um statement e o codigo do conteudo desse statement.
+    }
+    ;
+
+statement : ':' TYPE VAR DEFAULT {
+    Esta producao declara uma variavel de tipo TYPE, nome VAR e, opcionalmente,
+    um valor de default DEFAULT. Este default, se existir, tem de ser
+    compativel com o tipo da variavel a ser declarada.
+
+    Em primeiro lugar, verifica-se que o tipo do valor DEFAULT e compativel
+    com o da variavel a declarar. Este nao pode ser TYPE_ERROR, e, se
+    nao for TYPE_DEFAULT (i.e., nao dado nenhum valor default),
+    assegura-se que os tipos sao compativeis.
+    De seguida tenta-se adicionar a variavel a uma tabela que contem
+    todas as variaveis declaradas ate agora. E um erro declarar uma
+    variavel duas vezes, tenham ou nao tipos diferentes.
+    Caso esta operacao tenha sucedido, o codigo deste statement passa
+    a ser o codigo gerado pelo DEFAULT e, se existir DEFAULT,
+    acrescentamos a instrucao de STORE para guardar o valor na variavel.
+          }
+          | INC VAR {
+    Esta producao e equivalente a (= VAR (+ VAR 1)).
+          }
+          | '=' VAR expression
+    Nesta producao verificamos se VAR foi declarada e se os tipos da
+    variavel e da expressao sao compativeis. Se forem, o codigo resultante
+    e o de apender a instrucao STORE ao codigo da expressao.
+          | WRITE writable {
+    Nesta producao geramos codigo para escrever o valor de um writable.
+    writable pode ser tanto uma expressao como uma string literal.
+          }
+          | PRINT writable {
+    Esta producao faz o mesmo que o WRITE, mas escreve tambem um caracter
+    de mudanca de linha.
+          }
+          | READ VAR {
+    Esta producao le um valor do stdin e guarda o na variavel VAR.
+    E um erro se a variavel nao tiver sido declarada, ou nao for dos
+    tipos Int ou Float.
+    As instrucoes geradas sao, por ordem, READ, ATO[IF], STORE.
+          }
+          | IF expression2 '(' code_block ')' else_clause {
+    Nesta producao geramos um identificador unico para as labels
+    necessarias (ELSE e ENDIF). O codigo final e:
+        <codigo gerado pela expressao de condicao>
+        JZ ELSE
+        <codigo gerado pelo bloco then>
+        JUMP ENDIF
+        ELSE:
+        <codigo gerado pelo block else>
+        ENDIF:
+          }
+          | UNTIL expression2 '(' code_block ')' {
+    Nesta producao geramos um identificador unico para a label
+    necessaria (UNTIL). O codigo final e:
+        UNTIL:
+        <codigo gerado pelo bloco do ciclo>
+        <codigo gerado pela expressao de condicao>
+        JZ UNTIL
+          }
+          ;
+
+writable : expression {
+    O codigo de algo que pode ser escrito e o codigo da expressao.
+         }
+         | STR {
+    Nesta producao e simplemente gerada a instrucao PUSHS com a string
+    devolvida pelo Flex.
+         }
+         ;
+
+DEFAULT : {
+    Nesta producao nao e gerado nenhum codigo. O tipo desta producao e
+    TYPE_DEFAULT, para distinguir os casos em que existe valor default
+    dos casos em que nao existe.
+        }
+        | expression {
+    O codigo e o tipos do valor default de uma variavel sao os da expressao.
+        }
+        ;
+
+else_clause : {
+    Nesta producao nao e gerado nenhum codigo.
+            }
+            | '(' code_block ')' {
+    Nesta producao o codigo da else clause e o codigo gerado para o
+    bloco de codigo.
+            }
+            ;
+
+expression : VALUE {
+    Nesta producao gera-se a instrucao de PUSH com o valor lido pelo
+    Flex.
+           }
+           | expression2 {
+    O codigo resultante e o codigo gerado pela expression2.
+           }
+           | '(' expression_list ')' {
+    O codigo resultante e o codigo gerado pela expression_list.
+           }
+           ;
+
+VALUE : INT_VALUE {
+    O tipo desta producao e o tipo Int.
+      }
+      | FLOAT_VALUE {
+    O tipo desta producao e o tipo Float.
+      }
+      ;
+
+arith_op : '+' {  }
+         | '*' {  }
+         | '-' {  }
+         | '/' {  }
+         | '%' {  }
+         ;
+
+expression_list : arith_op expression expression {
+    O codigo resultante desta producao e o de concatenar o codigo da
+    primeira expressao com o da segunda e depois a instrucao correspondente
+    a operacao.
+    Esta producao corresponde a operacoes aritmetica sobre valores
+    numericos. E um erro se os tipos nao forem compativeis.
+                }
+                ;
+
+expression2 : VAR {
+    Nesta producao gera-se a instrucao de carregar o endereco da variavel
+    e a de carregar o valor nesse endereco.
+            }
+            | BOOL_VALUE {
+    Nesta producao gera-se a instrucao de por na stack o valor booleano
+    lido pelo Flex.
+            }
+            | '(' expression2_list ')' {
+    O codigo resultante e o codigo gerado pela expression2_list.
+            }
+            ;
+
+num_op : '<' {  }
+       | '=' {  }
+       | '>' {  }
+       | GEQ {  }
+       | LEQ {  }
+       | NEQ {  }
+       ;
+
+log_op : '&' {  }
+       | '|' {  }
+       ;
+
+expression2_list : '~' expression2 {
+    O codigo resultante desta producao e o de concatenar a instrucao
+    NOT ao codigo da expression2.
+    Esta producao corresponde a negacao logica.
+                 }
+                 | num_op expression expression {
+    O codigo resultante desta producao e o de concatenar o codigo da
+    primeira expressao com o da segunda e a instrucao correspondente
+    a operacao.
+    Esta producao corresponde a comparacao de valores numericos. E um
+    erro se os tipos das duas expressoes nao forem compativeis.
+                 }
+                 | log_op expression2 expression2 {
+    O codigo resultante desta producao e o de concatenar o codigo da
+    primeira expressao com o da segunda e a instrucao correspondente
+    a operacao.
+    Esta producao corresponde a operacoes logicas sobre valores booleanos.
+                 }
+                 ;
