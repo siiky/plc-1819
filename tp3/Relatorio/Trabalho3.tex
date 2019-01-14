@@ -87,24 +87,24 @@
 \maketitle
 
 \begin{abstract}
-Este relatório debruça-se sobre o desenvolvimento de uma linguagem imperativa que com o auxilio do Yacc\footnote{Yacc - Gerador de Processadores de Linguagens} gera código Assembly, sendo esse código executável em uma Máquina Virtual(VM)\footnote{Maquina Virtual que mostra o estado das várias stack's ao longo da execução do código gerado pelo Yacc em Assembly} fornecida pelo professor desta Unidade Curricular.
+Este relatório debruça-se sobre o desenvolvimento de uma linguagem imperativa que com o auxilio do Yacc\footnote{Yacc - Gerador de Processadores de Linguagens} gera código Assembly, sendo esse código executável em uma Máquina Virtual(VM)\footnote{Máquina Virtual que mostra o estado das várias stack's ao longo da execução do código gerado pelo Yacc em Assembly} fornecida pelo professor desta Unidade Curricular.
 \end{abstract}
 
 \tableofcontents
 
 \chapter{Introdução} \label{intro}
-Este relaório debruça-se sobre o desenvolvimento de uma linguagem imperativa que com o auxilio do Yacc\footnote{Yacc - Gerador de Processadores de Linguagens} gera código Assenbly, sendo esse código executável em uma Máquina Virtual(VM)\footnote{Maquina Virtual que mostra o estado das várias stack's ao longo da execução do código gerado pelo Yacc em Assembly} fornecida pela professor desta Unidade Curricular. 
+Este relaório debruça-se sobre o desenvolvimento de uma linguagem imperativa que com o auxilio do Yacc\footnote{Yacc - Gerador de Processadores de Linguagens} gera código Assenbly, sendo esse código executável em uma Máquina Virtual(VM)\footnote{Maquina Virtual que mostra o estado das várias stack's ao longo da execução do código gerado pelo Yacc em Assembly} fornecida pelo professor desta Unidade Curricular. 
 \section{Enquadramento}
-No âmbito da Unidade Curricular Processamento de Linguagens e Compiladores, o projecto proposto consiste na criação de uma Linguagem de Programação Imperativa que permita declarar variáveis atómicas dos tipos Inteiro, Real e Booleano e fazer as operações de atribuição de epressões a variáveis declaradas, leitura (de inteiros ou reais), escrita (de inteiros, reais, booleanos ou strings), condições e ciclos repetir....até 
-e gere código Assembly para a VM fornecida pela professor.
+No âmbito da Unidade Curricular Processamento de Linguagens e Compiladores, o projecto proposto consiste na criação de uma Linguagem de Programação Imperativa que permita declarar variáveis atómicas dos tipos Inteiro, Real e Booleano e fazer as operações de atribuição de expressões a variáveis declaradas, leitura (de inteiros ou reais), escrita (de inteiros, reais, booleanos ou strings), condições e ciclos repetir....até 
+e gerar código Assembly para a VM fornecida pelo professor.
 
 
 \section{Estrutura do Relatório}
-Neste relatório começamos com a Introdução (Capítulo 1) onde, de uma forma breve tentamos descrever o enquadramento do documento e a estrutura do mesmo. \\
-No capítulo 2 analisamos o texto a processar e o problema que nos foi proposto de forma mais detalhada bem como uma introdução da nossa abordagem ao mesmo.\\
-No capítulo 3 indicamos a estrutura de dados utilizada e explicamos o código por nós criado.\\
-No capítulo 4 apresentamos alguns testes realizados e o respectivo output.\\
-O capítulo 5 é composto pela conclusão, onde fazemos uma análise ao projecto executado.\\
+Neste relatório começamos com a Introdução (Capítulo 1) onde, de uma forma breve descrevemos o enquadramento do documento e a estrutura do mesmo. \\
+No capítulo 2 analisamos o problema que nos foi proposto de forma mais detalhada.\\
+No capítulo 3 explicamos a linguagem imperativa desenvolvida.\\
+No capítulo 4 está representada a gramática da linguagem imperativa desenvolv\\
+O capítulo 5 descreverá a conpecpção do analisador sintático.\\
 Por último o documento tem o apêndice onde foi introduzido o código fonte do ficheiro Yacc.
 
 
@@ -112,7 +112,7 @@ Por último o documento tem o apêndice onde foi introduzido o código fonte do fic
 \section{Descrição informal do problema}
 
 
-Este projecto tem como objectivo o aprofundamento de conhecimento Yacc (um gerador de processadores de linguagens). Para tal, foi-nos proposto construir uma linguagem imperativa e gerar um compilador que transforma a sintaxe da linguagem para "Assembly" reconhecido pela máquina virtual fornecida pelo professor da Unidade Curricular.
+Este projecto tem como objectivo o aprofundamento de conhecimento Yacc (um gerador de processadores de linguagens). Para tal, foi-nos proposto construir uma linguagem imperativa e gerar um compilador que transforma a sintaxe da linguagem para "Assembly"  reconhecido pela máquina virtual fornecida pelo professor da Unidade Curricular.
 
 \section{Especificação dos Requisitos\label{esp}}
 
@@ -248,8 +248,117 @@ Seguindo a definição da linguagem descrita no Capítulo 3 criamos a seguinte gram
 
 
 \chapter{Concepção/desenho da Resolução}
-Neste capítulo iremos descrever a concepção/desenho do analisador sintático iniciando cada ação semântica com um pequeno resumo seguido do código referido.
+Neste capítulo iremos descrever a concepção/desenho do analisador sintático indicando a produção em questão e uma breve explicação da respectiva ação semântica.
 
+\subsubsection{programa : code\_block}
+Nesta produção são impressas as declarações de variáveis locais, a instrução START para iniciar o programa, o código do programa em si e, finalmente, a instrução STOP que marca o fim do programa.\\
+
+
+\subsubsection{code\_block : statements}
+O código do bloco de código vai ser o código de um statement.\\
+
+\subsubsection{code\_block : statements code\_block}
+O código do bloco de código vai ser o resultado de concatenar o código de um statement com o código do resto do block. \\
+    
+\subsubsection{statements : '(' statement ')'}
+O código de um statement vai ser o código do conteúdo desse statement.\\
+
+\subsubsection{statement : ':' TYPE VAR DEFAULT}
+Esta produção declara uma variável do tipo TYPE, um nome do tipo VAR e, opcionalmente, um valor DEFAULT. Este default, se existir, tem de ser compatível com o tipo da variável a ser declarada.
+Em primeiro lugar, verifica-se que o tipo do valor DEFAULT é compatível com o da variável a declarar. Este não pode ser TYPE\_ERROR, e, se não for TYPE\_DEFAULT (i.e., não for dado nenhum valor default), verificam-se os tipos.
+De seguida tenta-se adicionar a variável a uma tabela que contém todas as variáveis declaradas até agora. É um erro declarar uma variável duas vezes, tenham ou não tipos diferentes.
+Caso esta operação tenha sucedido, o código deste statement passa a ser o código gerado pelo DEFAULT e, se existir DEFAULT, acrescentamos a instrução de STORE para guardar o valor na variável.
+
+\subsubsection{statement : INC VAR}
+Esta produção é equivalente a (= VAR (+ VAR 1)).
+
+\subsubsection{statement : '=' VAR expression}
+Nesta produção verificamos se VAR foi declarada e se os tipos da variável e da expressão são compatíveis. Se forem, o código resultante será o de apender a instrução STORE ao código da expressão.
+
+\subsubsection{statement : WRITE writable}
+Nesta produção geramos código para escrever o valor de um writable. Writable pode ser tanto uma expressão como uma string literal.
+
+\subsubsection{statement : PRINT writable}
+Esta produção faz o mesmo que o WRITE, mas escreve também um caracter de mudanca de linha.
+
+\subsubsection{statement : READ VAR}
+Esta produção de um valor do stdin e guarda-o na variável VAR.
+É um erro se a variável não tiver sido declarada, e não for dos tipos Int ou Float.
+As instruções geradas são, por ordem, READ, ATO[IF], STORE.
+
+\subsubsection{statement : IF expression2 '(' code\_block ')' else\_clause}
+Nesta produção geramos um identificador único para as labels necessárias (ELSE e ENDIF). O código final será:
+        <codigo gerado pela expressão de condição>
+        JZ ELSE
+        <codigo gerado pelo bloco then>
+        JUMP ENDIF
+        ELSE:
+        <codigo gerado pelo block else>
+        ENDIF:
+
+\subsubsection{statement : UNTIL expression2 '(' code\_block ')'}
+Nesta produção geramos um identificador único para a label necessária (UNTIL). O código final será:
+        UNTIL:
+        <codigo gerado pelo bloco do ciclo>
+        <codigo gerado pela expressao de condicao>
+        JZ UNTIL
+
+\subsubsection{writable : expression}
+O código de algo que pode ser escrito e o código da expressão.
+
+\subsubsection{writable : STR}
+Nesta produção é simplemente gerada a instrução PUSHS com a string devolvida pelo Flex.
+
+\subsubsection{DEFAULT : }
+Nesta produção não é gerado nenhum código. O tipo desta produção é TYPE\_DEFAULT, para distinguir os casos em que existe valor default dos casos em que não existe.
+
+\subsubsection{DEFAULT : expression}
+O valor de default vai ser o computado na expressão.
+
+\subsubsection{else\_clause : }
+Nesta produção não é gerado nenhum código.
+
+\subsubsection{else\_clause : '(' code\_block ')'}
+Nesta produção o código dá else clause e o código gerado para o bloco de código.
+
+\subsubsection{expression : VALUE}
+Nesta produção gera-se a instrução de PUSH com o valor lido pelo Flex.
+
+\subsubsection{expression : expression2}
+O código resultante é o código gerado pela expression2.
+
+\subsubsection{expression : '(' expression\_list ')'}
+O código resultante é o código gerado pela expression\_list.
+
+\subsubsection{VALUE : INT\_VALUE }
+O tipo desta produção é o tipo Int.
+   
+\subsubsection{VALUE :FLOAT\_VALUE}
+O tipo desta produção é o tipo Float.
+
+\subsubsection{expression\_list : arith\_op expression expression}
+O código resultante desta produção e o de concatenar o código da primeira expressão com o da segunda e depois a instrução correspondente a operação.
+Esta produção corresponde a operações aritmética sobre valores numéricos. É um erro se os tipos não forem compatíveis.
+              
+\subsubsection{expression2 : VAR}
+Nesta produção gera-se a instrução de carregar o endereço da variável e a de carregar o valor nesse endereço.
+   
+\subsubsection{expression2 : BOOL\_VALUE}
+Nesta produção gera-se a instrução de por na stack o valor booleano lido pelo Flex.
+
+\subsubsection{exoression2 : '(' expression2\_list ')'} 
+O código resultante e o código gerado pela expression2\_list.
+
+\subsubsection{expression2\_list : '~' expression2}
+O código resultante desta produção e o de concatenar a instrução NOT ao código da expression2.
+               
+\subsubsection{expression2\_list : num\_op expression expression}        
+O código resultante desta produção e o de concatenar o código da primeira expressão com o da segunda e a instrução correspondente a operação.
+Esta produção corresponde à comparação de valores numéricos. É um erro se os tipos das duas expressões não forem compatíveis.
+
+\subsubsection{expression2\_list : log\_op expression2 expression2}
+O código resultante desta produção e o de concatenar o código da primeira expressão com o da segunda e a instrução correspondente a operação.
+Esta produção corresponde a operações lógicas sobre valores booleanos.
 
 
 
@@ -261,7 +370,7 @@ Neste capítulo iremos descrever a concepção/desenho do analisador sintático inic
 \section{Testes realizados e Resultados}
 
 Para efeitos de teste preparamos vários ficheiros que cada um contém desde declarações, a atribuições, condições, ciclos, etc...\\
-Estes testes serão organizados em tabeas abaixo apresentadas com a primeira coluna a representar o código-fonte de acordo com a nossa linguagem imperativa criada e a segunda coluna o código em "assembly" em conformidada com a máquina virtual fornecida.
+Estes testes serão organizados em tabelas abaixo apresentadas com a primeira coluna a representar o código-fonte de acordo com a nossa linguagem imperativa criada e a segunda coluna com o código em "assembly" em conformidade com a máquina virtual fornecioda.
 \subsection{Declarações e Atribuições}
 \begin{tabular}{ | c |c|}
 \hline
