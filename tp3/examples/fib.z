@@ -1,0 +1,19 @@
+(: Int target 0)
+(: Int n 0)
+(: Int n1 0)
+(: Int n2 1)
+(: Int tmp 0)
+
+(write "Numero de fibonacci: ")
+(read target)
+
+(until (>= n target)
+ ((= tmp (+ n1 n2))
+  (= n1 n2)
+  (= n2 tmp)
+  (++ n)))
+
+(write "O ")
+(write target)
+(write " de fibonacci e ")
+(print n1)

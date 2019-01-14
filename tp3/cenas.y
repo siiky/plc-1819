@@ -335,7 +335,12 @@ expression2_list : '~' expression2 { trace();
 
                      $$.code = $2.code;
                      cbapp($$.code, $3.code);
-                     gen_op(&$$.code, $1, t1);
+                     if ($1 == NEQ) {
+                         gen_op(&$$.code, '=', t1);
+                         gen_op(&$$.code, '~', TYPE_BOOL);
+                     } else {
+                         gen_op(&$$.code, $1, t1);
+                     }
                  }
                  | log_op expression2 expression2 { trace();
                      enum type t1 = $2.type;
@@ -345,7 +350,6 @@ expression2_list : '~' expression2 { trace();
                          $1, type2str(t1), type2str(t2));
 
                      $$ = $2;
-
                      cbapp($$.code, $3.code);
                      gen_op(&$$.code, $1, t1);
                  }

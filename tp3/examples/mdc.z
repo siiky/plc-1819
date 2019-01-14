@@ -1,0 +1,17 @@
+(: Int x 1)
+(: Int y 1)
+(: Int tmp 0)
+
+(write "x = ")
+(read x)
+
+(write "y = ")
+(read y)
+
+(until (<= y 0)
+ ((= tmp x)
+  (= x y)
+  (= y (% tmp y))))
+
+(write "mdc(x, y) = ")
+(print x)

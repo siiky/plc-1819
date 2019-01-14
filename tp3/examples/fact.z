@@ -1,0 +1,15 @@
+(: Int target 0)
+(: Int res 1)
+(: Int n 0)
+
+(write "Factorial: ")
+(read target)
+(= n target)
+
+(until (<= n 0)
+  ((= res (* res n))
+   (= n (- n 1))))
+
+(write target)
+(write "! = ")
+(print res)
